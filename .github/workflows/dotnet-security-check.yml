@@ -117,7 +117,8 @@ jobs:
             echo '### Vulnerability Report' >> $GITHUB_STEP_SUMMARY
             echo '\n\n<details><summary>Show full report</summary>\n' >> $GITHUB_STEP_SUMMARY
             cat vuln-report.txt >> $GITHUB_STEP_SUMMARY
-            echo '\n</details>' >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo '</details>' >> $GITHUB_STEP_SUMMARY
           fi
 
 # Notes & Best Practices:
