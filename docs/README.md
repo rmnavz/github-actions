@@ -45,8 +45,6 @@ This repository provides a set of reusable GitHub Actions workflows for .NET and
 - **Inputs:** `dotnet_version`, `run_vulnerability_check`, `run_codeql`
 - **Outputs:** `vulnerability_status`
 - **Docs:** [docs/dotnet-security-check.md](dotnet-security-check.md)
-- **Outputs:** `release_url`
-- **Docs:** [docs/publish-package-dotnet-release.md](publish-package-dotnet-release.md)
 
 ### 6. tag-git-generic-release.yml
 
