@@ -1,0 +1,31 @@
+# ============================================================================
+# .NET Security Check - Workflow Template
+# This template sets up a reusable .NET security check workflow.
+# ============================================================================
+name: .NET Security Check (Template)
+
+on:
+  workflow_call:
+    inputs:
+      dotnet_version:
+        description: '.NET SDK version (e.g., 8.0.x)'
+        required: false
+        default: '8.0.x'
+        type: string
+      run_vulnerability_check:
+        description: 'Run dotnet package vulnerability check'
+        required: false
+        default: true
+        type: boolean
+      run_codeql:
+        description: 'Run CodeQL analysis'
+        required: false
+        default: false
+        type: boolean
+jobs:
+  security-check:
+    uses: ./.github/workflows/dotnet-security-check.yml
+    with:
+      dotnet_version: ${{ inputs.dotnet_version }}
+      run_vulnerability_check: ${{ inputs.run_vulnerability_check }}
+      run_codeql: ${{ inputs.run_codeql }}

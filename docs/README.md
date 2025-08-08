@@ -38,6 +38,13 @@ This repository provides a set of reusable GitHub Actions workflows for .NET and
 - **Purpose:** Publishes NuGet packages using any versioning scheme and creates a GitHub release. Designed for universal use and workflow reusability.
 - **Inputs:** `release_version`, `prerelease`, `include_test_results`, `artifact_name`
 - **Secrets:** `NUGET_API_KEY`, `GITHUB_TOKEN`
+
+### 6. dotnet-security-check.yml
+
+- **Purpose:** Checks for vulnerable .NET packages and optionally runs CodeQL analysis. Designed for universal use and workflow reusability.
+- **Inputs:** `dotnet_version`, `run_vulnerability_check`, `run_codeql`
+- **Outputs:** `vulnerability_status`
+- **Docs:** [docs/dotnet-security-check.md](dotnet-security-check.md)
 - **Outputs:** `release_url`
 - **Docs:** [docs/publish-package-dotnet-release.md](publish-package-dotnet-release.md)
 

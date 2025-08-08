@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Publishing workflows for NuGet packages and GitHub releases
 - Git tagging workflows for release automation
 - Semantic versioning workflows using GitVersion
+- Security check workflow for .NET vulnerability scanning and CodeQL analysis
 - Comprehensive documentation for all workflows
 - Workflow templates for easy adoption
 - Contributing guidelines and issue templates
