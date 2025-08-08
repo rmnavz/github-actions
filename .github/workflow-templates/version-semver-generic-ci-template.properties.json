@@ -1,0 +1,7 @@
+{
+  "name": "Version (Semantic, Generic CI)",
+  "description": "Reusable workflow template for determining semantic version using GitVersion.",
+  "iconName": "git",
+  "categories": ["git", "ci", "version"],
+  "filePatterns": ["**/gitversion.yml", "**/*.yml"]
+}

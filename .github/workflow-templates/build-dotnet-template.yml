@@ -1,0 +1,24 @@
+# ============================================================================
+# Build .NET Project - Workflow Template
+# This template can be used to quickly set up a reusable .NET build workflow
+# in any repository. It leverages the reusable workflow in this repo.
+# ============================================================================
+name: Build .NET Project (Template)
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    uses: ./.github/workflows/build-solution-dotnet-ci.yml
+    with:
+      dotnet_version: 8.0.x
+      project_path: ''
+      artifact_name: build-artifacts
+      artifact_paths: |
+        **/bin/Release/
+      artifact_retention_days: 7
+      upload_artifacts: true

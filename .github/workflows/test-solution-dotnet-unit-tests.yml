@@ -1,0 +1,165 @@
+
+# ============================================================================
+# Test Solution (.NET Unit Tests)
+# Runs tests for a .NET solution or project, collects coverage, and uploads test results as artifacts. Designed for universal use via workflow_call.
+# ----------------------------------------------------------------------------
+# Inputs:
+#   dotnet_version (string, optional): .NET SDK version (default: 8.0.x)
+#   project_path (string, optional): Path to solution/project (blank = auto-discover)
+#   use_build_artifact (boolean, optional): Download and use build artifact from previous build job? (default: false)
+#   build_artifact_name (string, optional): Name of the build artifact to download (default: build-artifacts)
+#   test_results_artifact_name (string, optional): Name for uploaded test results artifact (default: test-results)
+#   test_results_paths (string, optional): Paths to test result files to upload (default: TestResults/**/*.trx, TestResults/**/*.xml)
+#   test_results_retention_days (number, optional): Days to keep test results artifact (default: 30)
+# Outputs: None
+# Usage Example:
+#   jobs:
+#     test:
+#       uses: rmnavz/github-actions/.github/workflows/test-solution-dotnet-unit-tests.yml@v1.0.0
+#       with:
+#         dotnet_version: '8.0.x'
+#         project_path: 'src/MyProject.sln'
+# Documentation: See docs/test-solution-dotnet-unit-tests.md
+# ============================================================================
+
+name: Test Solution (.NET Unit Tests)
+
+on:
+  workflow_call:
+    inputs:
+      dotnet_version:
+        description: '.NET SDK version (e.g., 8.0.x)'
+        required: false
+        type: string
+        default: 8.0.x
+      project_path:
+        description: 'Path to solution/project (blank = auto-discover)'
+        required: false
+        type: string
+        default: ''
+      use_build_artifact:
+        description: 'Download and use build artifact from previous build job?'
+        required: false
+        type: boolean
+        default: false
+      build_artifact_name:
+        description: 'Name of the build artifact to download (if used)'
+        required: false
+        type: string
+        default: build-artifacts
+      test_results_artifact_name:
+        description: 'Name for uploaded test results artifact'
+        required: false
+        type: string
+        default: test-results
+      test_results_paths:
+        description: 'Paths to test result files to upload'
+        required: false
+        type: string
+        default: |
+          TestResults/**/*.trx
+          TestResults/**/*.xml
+      test_results_retention_days:
+        description: 'Days to keep test results artifact'
+        required: false
+        type: number
+        default: 30
+  workflow_dispatch:
+    inputs:
+      dotnet_version:
+        description: '.NET SDK version (e.g., 8.0.x)'
+        required: false
+        default: 8.0.x
+      project_path:
+        description: 'Path to solution/project (blank = auto-discover)'
+        required: false
+        default: ''
+      use_build_artifact:
+        description: 'Download and use build artifact from previous build job?'
+        required: false
+        default: 'false'
+      build_artifact_name:
+        description: 'Name of the build artifact to download (if used)'
+        required: false
+        default: build-artifacts
+      test_results_artifact_name:
+        description: 'Name for uploaded test results artifact'
+        required: false
+        default: test-results
+      test_results_paths:
+        description: 'Paths to test result files to upload'
+        required: false
+        default: |
+          TestResults/**/*.trx
+          TestResults/**/*.xml
+      test_results_retention_days:
+        description: 'Days to keep test results artifact'
+        required: false
+        default: '30'
+
+jobs:
+  test-dotnet-solution:
+    name: Test .NET Solution
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ inputs.dotnet_version }}
+
+      # Optionally download build artifact from a previous build job
+      - name: Download Build Artifact
+        if: ${{ inputs.use_build_artifact == true }}
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.build_artifact_name }}
+          path: ./
+
+      - name: Restore NuGet Packages
+        run: dotnet restore ${{ inputs.project_path }}
+
+      # Optionally skip build if using build artifact
+      - name: Build Solution/Project
+
+# Notes & Best Practices:
+# - Use clear, descriptive names for jobs, steps, and inputs.
+# - Document all inputs, outputs, and secrets at the top.
+# - Use 'workflow_call' for reusability and composability.
+# - Use 'id:' for steps whose outputs are needed later.
+# - Pin action versions for reproducibility.
+# - Add caching or matrix strategies if needed for your stack.
+        if: ${{ inputs.use_build_artifact != true }}
+        run: dotnet build ${{ inputs.project_path }} --no-restore --configuration Release
+
+      - name: Install Coverage Tool
+        run: dotnet tool install --global coverlet.console
+
+      - name: Run Unit Tests
+        run: |
+          dotnet test ${{ inputs.project_path }} \
+            --no-build \
+            --configuration Release \
+            --verbosity normal \
+            --logger "trx;LogFileName=test-results.trx" \
+            --collect:"XPlat Code Coverage" \
+            --results-directory ./TestResults/
+
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ${{ inputs.test_results_artifact_name }}
+          path: ${{ inputs.test_results_paths }}
+          retention-days: ${{ inputs.test_results_retention_days }}
+
+      - name: Publish Test Results
+        uses: dorny/test-reporter@v1
+        if: always()
+        continue-on-error: true
+        with:
+          name: Test Results
+          path: TestResults/**/*.trx
+          reporter: dotnet-trx

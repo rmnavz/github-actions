@@ -1,0 +1,7 @@
+{
+  "name": "Test Solution (.NET Unit Tests)",
+  "description": "Reusable workflow template for running .NET unit tests, collecting code coverage, and uploading test results as artifacts.",
+  "iconName": "dotnet",
+  "categories": ["ci", "dotnet", "testing", "coverage"],
+  "filePatterns": ["**/*.csproj", "**/*.sln", "TestResults/**/*.trx", "TestResults/**/*.xml"]
+}

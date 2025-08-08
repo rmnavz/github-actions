@@ -1,0 +1,7 @@
+{
+  "name": "Build Package (.NET CI)",
+  "description": "Reusable workflow template for building and packaging .NET projects, uploading NuGet packages as artifacts.",
+  "iconName": "dotnet",
+  "categories": ["C#", ".NET", "ci", "package"],
+  "filePatterns": ["**/*.csproj", "**/*.sln", "./artifacts/*.nupkg"]
+}

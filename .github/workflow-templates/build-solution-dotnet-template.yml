@@ -1,0 +1,49 @@
+# ============================================================================
+# Build Solution (.NET CI) - Workflow Template
+# This template sets up a reusable .NET solution build workflow.
+# ============================================================================
+name: Build Solution (.NET CI) (Template)
+
+on:
+  workflow_call:
+    inputs:
+      dotnet_version:
+        description: '.NET SDK version (e.g., 8.0.x)'
+        required: false
+        default: '8.0.x'
+        type: string
+      project_path:
+        description: 'Path to solution/project (blank = auto-discover)'
+        required: false
+        default: ''
+        type: string
+      artifact_name:
+        description: 'Name for uploaded artifact'
+        required: false
+        default: 'build-artifacts'
+        type: string
+      artifact_paths:
+        description: 'Paths to include in artifact'
+        required: false
+        default: '**/bin/Release/'
+        type: string
+      artifact_retention_days:
+        description: 'Days to keep artifact'
+        required: false
+        default: 7
+        type: number
+      upload_artifacts:
+        description: 'Whether to upload build artifacts'
+        required: false
+        default: true
+        type: boolean
+jobs:
+  build:
+    uses: ./.github/workflows/build-solution-dotnet-ci.yml
+    with:
+      dotnet_version: ${{ inputs.dotnet_version }}
+      project_path: ${{ inputs.project_path }}
+      artifact_name: ${{ inputs.artifact_name }}
+      artifact_paths: ${{ inputs.artifact_paths }}
+      artifact_retention_days: ${{ inputs.artifact_retention_days }}
+      upload_artifacts: ${{ inputs.upload_artifacts }}

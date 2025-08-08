@@ -1,0 +1,173 @@
+
+
+
+# ============================================================================
+# Build Solution (.NET CI)
+# Builds a .NET solution or project, caches dependencies, and (optionally) uploads build artifacts. Designed for universal use via workflow_call.
+# ----------------------------------------------------------------------------
+# Inputs:
+#   dotnet_version (string, optional): .NET SDK version (default: 8.0.x)
+#   project_path (string, optional): Path to solution/project (blank = auto-discover)
+#   artifact_name (string, optional): Name for uploaded artifact (default: build-artifacts)
+#   artifact_paths (string, optional): Paths to include in artifact (default: **/bin/Release/)
+#   artifact_retention_days (number, optional): Days to keep artifact (default: 7)
+#   upload_artifacts (boolean, optional): Whether to upload build artifacts (default: true)
+# Outputs:
+#   build_status, artifact_url
+# Usage Example:
+#   jobs:
+#     build-solution:
+#       uses: rmnavz/github-actions/.github/workflows/build-solution-dotnet-ci.yml@v1.0.0
+#       with:
+#         dotnet_version: '8.0.x'
+#         project_path: 'src/MyProject.sln'
+# Documentation: See docs/build-solution-dotnet-ci.md
+# ============================================================================
+
+name: Build Solution (.NET CI)
+
+on:
+  workflow_call:
+    inputs:
+      dotnet_version:
+        description: '.NET SDK version (e.g., 8.0.x)'
+        required: false
+        type: string
+        default: 8.0.x
+      project_path:
+        description: 'Path to solution/project (blank = auto-discover)'
+        required: false
+        type: string
+        default: ''
+      artifact_name:
+        description: 'Name for uploaded artifact'
+        required: false
+        type: string
+        default: build-artifacts
+      artifact_paths:
+        description: 'Paths to include in artifact'
+        required: false
+        type: string
+        default: |
+          **/bin/Release/
+      artifact_retention_days:
+        description: 'Days to keep artifact'
+        required: false
+        type: number
+        default: 7
+      upload_artifacts:
+        description: 'Whether to upload build artifacts'
+        required: false
+        type: boolean
+        default: true
+  workflow_dispatch:
+    inputs:
+      dotnet_version:
+        description: '.NET SDK version (e.g., 8.0.x)'
+        required: false
+        default: 8.0.x
+      project_path:
+        description: 'Path to solution/project (blank = auto-discover)'
+        required: false
+        default: ''
+      artifact_name:
+        description: 'Name for uploaded artifact'
+        required: false
+        default: build-artifacts
+      artifact_paths:
+        description: 'Paths to include in artifact'
+        required: false
+        default: |
+          **/bin/Release/
+      artifact_retention_days:
+        description: 'Days to keep artifact'
+        required: false
+        default: '7'
+      upload_artifacts:
+        description: 'Whether to upload build artifacts'
+        required: false
+        default: 'true'
+
+jobs:
+  build-solution:
+    name: Build .NET Solution
+    runs-on: ubuntu-latest
+    outputs:
+      build_status: ${{ steps.set-status.outputs.build_status }}
+      artifact_url: ${{ steps.upload-artifact.outputs.artifact-url }}
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      # 2. Setup .NET SDK
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ inputs.dotnet_version }}
+
+      # 3. Cache NuGet packages and build outputs
+      - name: Cache NuGet Packages and Build Output
+        uses: actions/cache@v4
+        with:
+
+# Notes & Best Practices:
+# - Use clear, descriptive names for jobs, steps, and inputs.
+# - Document all inputs, outputs, and secrets at the top.
+# - Use 'workflow_call' for reusability and composability.
+# - Use 'id:' for steps whose outputs are needed later.
+# - Pin action versions for reproducibility.
+          path: |
+            ~/.nuget/packages
+            **/obj/
+          key: ${{ runner.os }}-dotnet-${{ inputs.dotnet_version }}-build-${{ hashFiles('**/*.csproj', '**/Directory.Build.props', '**/Directory.Packages.props') }}
+          restore-keys: |
+            ${{ runner.os }}-dotnet-${{ inputs.dotnet_version }}-build-
+
+      # =============================
+      # 4. Restore NuGet packages
+      # =============================
+      - name: Restore NuGet Packages
+        run: dotnet restore ${{ inputs.project_path }}
+        continue-on-error: false
+
+      # =============================
+      # 5. Build the solution or project
+      # =============================
+      - name: Build Solution
+        run: dotnet build ${{ inputs.project_path }} --no-restore --configuration Release
+        continue-on-error: false
+
+      # =============================
+      # 6. Optionally upload build artifacts
+      # =============================
+      - name: Upload Build Artifacts
+        if: ${{ inputs.upload_artifacts == true }}
+        id: upload-artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.artifact_name }}
+          path: ${{ inputs.artifact_paths }}
+          retention-days: ${{ inputs.artifact_retention_days }}
+        continue-on-error: false
+
+      # =============================
+      # 7. Set build status output for downstream jobs
+      # =============================
+      - name: Set Build Status Output
+        if: always()
+        id: set-status
+        run: |
+          if [ "$GITHUB_JOB" == "build" ] && [ "$GITHUB_RUN_ATTEMPT" -gt 0 ]; then
+            echo "build_status=failure" >> $GITHUB_OUTPUT
+          else
+            echo "build_status=success" >> $GITHUB_OUTPUT
+          fi
+
+      # =============================
+      # 8. Add a summary to the workflow run (if artifacts uploaded)
+      # =============================
+      - name: Build Summary
+        if: always() && inputs.upload_artifacts == true
+        run: |
+          echo "## Build Status: ${{ steps.set-status.outputs.build_status }}" >> $GITHUB_STEP_SUMMARY
+          echo "### Artifact URL: ${{ steps.upload-artifact.outputs.artifact-url }}" >> $GITHUB_STEP_SUMMARY

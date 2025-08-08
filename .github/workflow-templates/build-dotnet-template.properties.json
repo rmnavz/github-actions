@@ -1,0 +1,15 @@
+{
+    "name": "Build .NET Project",
+    "description": "Reusable workflow template for building .NET projects with caching and optional artifact upload.",
+    "iconName": "dotnet",
+    "categories": [
+        "C#",
+        ".NET"
+    ],
+    "filePatterns": [
+        "^.*\\.csproj$",
+        "^.*\\.sln$",
+        "^Directory.Build.props$",
+        "^Directory.Packages.props$"
+    ]
+}

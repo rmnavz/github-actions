@@ -1,0 +1,7 @@
+{
+  "name": "Publish Package (.NET Release)",
+  "description": "Reusable workflow template for publishing NuGet packages and creating GitHub releases.",
+  "iconName": "dotnet",
+  "categories": ["C#", ".NET", "release", "publish"],
+  "filePatterns": ["./artifacts/*.nupkg", "**/*.csproj", "**/*.sln"]
+}

@@ -1,0 +1,25 @@
+# ============================================================================
+# Version (Semantic, Generic CI) - Workflow Template
+# This template sets up a reusable semantic versioning workflow.
+# ============================================================================
+name: Version (Semantic, Generic CI) (Template)
+
+on:
+  workflow_call:
+    inputs:
+      gitversion_version:
+        description: 'GitVersion version to use'
+        required: false
+        default: '5.x'
+        type: string
+      gitversion_config:
+        description: 'Path to gitversion.yml config file (optional)'
+        required: false
+        default: ''
+        type: string
+jobs:
+  get-version:
+    uses: ./.github/workflows/version-semver-generic-ci.yml
+    with:
+      gitversion_version: ${{ inputs.gitversion_version }}
+      gitversion_config: ${{ inputs.gitversion_config }}

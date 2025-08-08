@@ -1,0 +1,29 @@
+# EditorConfig helps maintain consistent coding styles for multiple developers working on the same project across various editors and IDEs
+# For more information: https://EditorConfig.org
+
+root = true
+
+# Top-level settings for all files
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 2
+
+# C# files
+[*.cs]
+indent_size = 4
+
+# YAML files (GitHub Actions workflows)
+[*.yml]
+indent_size = 2
+
+# Markdown files
+[*.md]
+trim_trailing_whitespace = false
+
+# JSON files
+[*.json]
+indent_size = 2

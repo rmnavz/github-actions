@@ -1,0 +1,54 @@
+# ============================================================================
+# Build Package (.NET CI) - Workflow Template
+# This template sets up a reusable .NET package build workflow.
+# ============================================================================
+name: Build Package (.NET CI) (Template)
+
+on:
+  workflow_call:
+    inputs:
+      release_version:
+        description: 'Release version (e.g., 1.2.3, 2025.08.08, release-42)'
+        required: true
+        type: string
+      dotnet_version:
+        description: '.NET SDK version (e.g., 8.0.x)'
+        required: false
+        default: '8.0.x'
+        type: string
+      project_path:
+        description: 'Path to solution/project (blank = auto-discover)'
+        required: false
+        default: '.'
+        type: string
+      artifact_name:
+        description: 'Name for uploaded artifact'
+        required: false
+        default: 'nuget-packages'
+        type: string
+      artifact_paths:
+        description: 'Paths to include in artifact'
+        required: false
+        default: './artifacts/*.nupkg'
+        type: string
+      artifact_retention_days:
+        description: 'Days to keep artifact'
+        required: false
+        default: 7
+        type: number
+      upload_artifacts:
+        description: 'Whether to upload build artifacts'
+        required: false
+        default: true
+        type: boolean
+jobs:
+  build-package:
+    uses: ./.github/workflows/build-package-dotnet-ci.yml
+    with:
+      release_version: ${{ inputs.release_version }}
+      dotnet_version: ${{ inputs.dotnet_version }}
+      project_path: ${{ inputs.project_path }}
+      artifact_name: ${{ inputs.artifact_name }}
+      artifact_paths: ${{ inputs.artifact_paths }}
+      artifact_retention_days: ${{ inputs.artifact_retention_days }}
+      upload_artifacts: ${{ inputs.upload_artifacts }}

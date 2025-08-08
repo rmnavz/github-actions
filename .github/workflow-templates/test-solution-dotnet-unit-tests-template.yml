@@ -1,0 +1,55 @@
+# ============================================================================
+# Test Solution (.NET Unit Tests) - Workflow Template
+# This template sets up a reusable .NET unit test workflow.
+# ============================================================================
+name: Test Solution (.NET Unit Tests) (Template)
+
+on:
+  workflow_call:
+    inputs:
+      dotnet_version:
+        description: '.NET SDK version (e.g., 8.0.x)'
+        required: false
+        default: '8.0.x'
+        type: string
+      project_path:
+        description: 'Path to solution/project (blank = auto-discover)'
+        required: false
+        default: ''
+        type: string
+      use_build_artifact:
+        description: 'Download and use build artifact from previous build job?'
+        required: false
+        default: false
+        type: boolean
+      build_artifact_name:
+        description: 'Name of the build artifact to download (if used)'
+        required: false
+        default: 'build-artifacts'
+        type: string
+      test_results_artifact_name:
+        description: 'Name for uploaded test results artifact'
+        required: false
+        default: 'test-results'
+        type: string
+      test_results_paths:
+        description: 'Paths to test result files to upload'
+        required: false
+        default: 'TestResults/**/*.trx\nTestResults/**/*.xml'
+        type: string
+      test_results_retention_days:
+        description: 'Days to keep test results artifact'
+        required: false
+        default: 30
+        type: number
+jobs:
+  test:
+    uses: ./.github/workflows/test-solution-dotnet-unit-tests.yml
+    with:
+      dotnet_version: ${{ inputs.dotnet_version }}
+      project_path: ${{ inputs.project_path }}
+      use_build_artifact: ${{ inputs.use_build_artifact }}
+      build_artifact_name: ${{ inputs.build_artifact_name }}
+      test_results_artifact_name: ${{ inputs.test_results_artifact_name }}
+      test_results_paths: ${{ inputs.test_results_paths }}
+      test_results_retention_days: ${{ inputs.test_results_retention_days }}

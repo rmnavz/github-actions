@@ -1,0 +1,101 @@
+
+# ============================================================================
+# Version (Semantic, Generic CI)
+# Determines a semantic version using GitVersion (language-agnostic) and outputs it for use by other workflows (no tagging).
+# ----------------------------------------------------------------------------
+# Inputs:
+#   gitversion_version (string, optional): GitVersion version to use (default: '5.x')
+#   gitversion_config  (string, optional): Path to gitversion.yml config file (optional)
+# Outputs:
+#   semver, major, minor, patch, fullSemVer
+# Usage Example:
+#   jobs:
+#     get-version:
+#       uses: rmnavz/github-actions/.github/workflows/version-semver-generic-ci.yml@v1.0.0
+#       with:
+#         gitversion_version: '5.x'
+#         gitversion_config: '.github/gitversion.yml'
+# Documentation: No dedicated docs/version-semver-generic-ci.md as of 2025-08-08. See workflow header and inline comments for usage details.
+# ============================================================================
+
+name: Version (Semantic, Generic CI)
+
+on:
+  workflow_call:
+    inputs:
+      gitversion_version:
+        description: 'GitVersion version to use'
+        required: false
+        default: '5.x'
+        type: string
+      gitversion_config:
+        description: 'Path to gitversion.yml config file (optional)'
+        required: false
+        default: ''
+        type: string
+    outputs:
+      semver:
+        description: 'The calculated semantic version'
+        value: ${{ jobs.get-semver-version.outputs.semver }}
+      major:
+        description: 'Major version'
+        value: ${{ jobs.get-semver-version.outputs.major }}
+      minor:
+        description: 'Minor version'
+        value: ${{ jobs.get-semver-version.outputs.minor }}
+      patch:
+        description: 'Patch version'
+        value: ${{ jobs.get-semver-version.outputs.patch }}
+      fullSemVer:
+        description: 'Full semantic version'
+        value: ${{ jobs.get-semver-version.outputs.fullSemVer }}
+
+
+jobs:
+  get-semver-version:
+    name: Get Semantic Version
+    runs-on: ubuntu-latest
+    outputs:
+      semver: ${{ steps.gitversion.outputs.semver }}
+      major: ${{ steps.gitversion.outputs.major }}
+      minor: ${{ steps.gitversion.outputs.minor }}
+      patch: ${{ steps.gitversion.outputs.patch }}
+      fullSemVer: ${{ steps.gitversion.outputs.fullSemVer }}
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@v0.9.15
+        with:
+          versionSpec: ${{ inputs.gitversion_version }}
+          includePrerelease: true
+
+      - name: Determine Semantic Version
+        id: gitversion
+        run: |
+          if [ "${{ inputs.gitversion_config }}" != "" ]; then
+            gitversion /output json -c "${{ inputs.gitversion_config }}" | tee version.json
+          else
+            gitversion /output json | tee version.json
+          fi
+          echo "semver=$(cat version.json | jq -r ".SemVer")" >> $GITHUB_OUTPUT
+          echo "major=$(cat version.json | jq -r ".Major")" >> $GITHUB_OUTPUT
+          echo "minor=$(cat version.json | jq -r ".Minor")" >> $GITHUB_OUTPUT
+          echo "patch=$(cat version.json | jq -r ".Patch")" >> $GITHUB_OUTPUT
+          echo "fullSemVer=$(cat version.json | jq -r ".FullSemVer")" >> $GITHUB_OUTPUT
+
+      - name: Debug Version Output
+        run: |
+          echo "Contents of version.json:" && cat version.json
+          echo "Extracted semver:" && jq -r ".SemVer" version.json
+
+# Notes & Best Practices:
+# - Use clear, descriptive names for jobs, steps, and inputs.
+# - Document all inputs, outputs, and secrets at the top.
+# - Use 'workflow_call' for reusability and composability.
+# - Use 'id:' for steps whose outputs are needed later.
+# - Pin action versions for reproducibility.
+# - Add caching or matrix strategies if needed for your stack.

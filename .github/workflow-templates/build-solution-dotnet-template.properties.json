@@ -1,0 +1,7 @@
+{
+  "name": "Build Solution (.NET CI)",
+  "description": "Reusable workflow template for building .NET solutions or projects with caching and optional artifact upload.",
+  "iconName": "dotnet",
+  "categories": ["C#", ".NET", "ci", "build"],
+  "filePatterns": ["**/*.csproj", "**/*.sln", "Directory.Build.props", "Directory.Packages.props"]
+}

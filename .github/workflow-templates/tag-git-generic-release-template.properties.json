@@ -1,0 +1,7 @@
+{
+  "name": "Tag Git (Generic Release)",
+  "description": "Reusable workflow template for creating and pushing git tags using any provided string.",
+  "iconName": "git",
+  "categories": ["git", "release", "tag"],
+  "filePatterns": ["**/*.git", "**/*.yml"]
+}
