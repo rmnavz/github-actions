@@ -1,0 +1,130 @@
+
+
+# ============================================================================
+# .NET Security Check
+# Checks for vulnerable .NET packages and optionally runs CodeQL analysis.
+# Designed for universal use and workflow reusability.
+# ----------------------------------------------------------------------------
+# Inputs:
+#   dotnet_version (string, optional): .NET SDK version (default: 8.0.x)
+#   run_vulnerability_check (boolean, optional): Run dotnet package vulnerability check (default: true)
+#   run_codeql (boolean, optional): Run CodeQL analysis (default: false)
+# Outputs:
+#   vulnerability_status: Status of vulnerability check ('found' or 'none')
+# Usage Example:
+#   jobs:
+#     dotnet-security-check:
+#       uses: rmnavz/github-actions/.github/workflows/dotnet-security-check.yml@v1.0.0
+#       with:
+#         dotnet_version: '8.0.x'
+#         run_vulnerability_check: true
+#         run_codeql: false
+# Documentation: See docs/dotnet-security-check.md for more details.
+# ============================================================================
+
+
+name: .NET Security Check
+
+on:
+  workflow_call:
+    inputs:
+      dotnet_version:
+        description: '.NET SDK version (e.g., 8.0.x)'
+        required: false
+        type: string
+        default: 8.0.x
+      run_vulnerability_check:
+        description: 'Run dotnet package vulnerability check'
+        required: false
+        type: boolean
+        default: true
+      run_codeql:
+        description: 'Run CodeQL analysis'
+        required: false
+        type: boolean
+        default: false
+  workflow_dispatch:
+    inputs:
+      dotnet_version:
+        description: '.NET SDK version (e.g., 8.0.x)'
+        required: false
+        default: 8.0.x
+      run_vulnerability_check:
+        description: 'Run dotnet package vulnerability check'
+        required: false
+        type: boolean
+        default: true
+      run_codeql:
+        description: 'Run CodeQL analysis'
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  dotnet-security-check:
+    name: .NET Security Check
+    runs-on: ubuntu-latest
+    outputs:
+      vulnerability_status: ${{ steps.vuln-check.outputs.vulnerability_status }}
+    steps:
+      # 1. Checkout source code
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      # 2. Setup .NET SDK
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ inputs.dotnet_version }}
+
+      # 3. Check for vulnerable packages (optional)
+      - name: Check for Vulnerable Packages
+        id: vuln-check
+        if: ${{ inputs.run_vulnerability_check == true }}
+        run: |
+          set -e
+          dotnet list package --vulnerable --include-transitive > vuln-report.txt || true
+          if grep -q 'has the following vulnerable packages' vuln-report.txt; then
+            echo "vulnerability_status=found" >> $GITHUB_OUTPUT
+          else
+            echo "vulnerability_status=none" >> $GITHUB_OUTPUT
+          fi
+          cat vuln-report.txt
+
+      # 4. CodeQL analysis (optional)
+      - name: Initialize CodeQL
+        if: ${{ inputs.run_codeql == true }}
+        uses: github/codeql-action/init@v3
+        with:
+          languages: csharp
+          queries: security-and-quality
+
+      - name: Autobuild
+        if: ${{ inputs.run_codeql == true }}
+        uses: github/codeql-action/autobuild@v3
+
+      - name: Perform CodeQL Analysis
+        if: ${{ inputs.run_codeql == true }}
+        uses: github/codeql-action/analyze@v3
+
+      # 5. Add summary to workflow run
+      - name: Security Check Summary
+        if: always()
+        run: |
+          echo "## .NET Security Check" >> $GITHUB_STEP_SUMMARY
+          echo "- Vulnerability check status: ${{ steps.vuln-check.outputs.vulnerability_status }}" >> $GITHUB_STEP_SUMMARY
+          if [ -f vuln-report.txt ]; then
+            echo '### Vulnerability Report' >> $GITHUB_STEP_SUMMARY
+            echo '\n\n<details><summary>Show full report</summary>\n' >> $GITHUB_STEP_SUMMARY
+            cat vuln-report.txt >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo '</details>' >> $GITHUB_STEP_SUMMARY
+          fi
+
+# Notes & Best Practices:
+# - Use clear, descriptive names for jobs, steps, and inputs.
+# - Document all inputs, outputs, and secrets at the top.
+# - Use 'workflow_call' for reusability and composability.
+# - Use 'id:' for steps whose outputs are needed later.
+# - Pin action versions for reproducibility.
+# - Add caching or matrix strategies if needed for your stack.

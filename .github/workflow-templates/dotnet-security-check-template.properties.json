@@ -1,0 +1,7 @@
+{
+  "name": ".NET Security Check",
+  "description": "Reusable workflow template for checking .NET package vulnerabilities and running CodeQL analysis.",
+  "iconName": "dotnet",
+  "categories": ["C#", ".NET", "security", "codeql"],
+  "filePatterns": ["**/*.csproj", "**/*.sln", "**/*.dll", "**/*.cs"]
+}
