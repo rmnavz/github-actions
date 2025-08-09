@@ -48,12 +48,10 @@ This repository provides a set of reusable GitHub Actions workflows for .NET and
 
 ### 6. tag-git-generic-release.yml
 
-- **Purpose:** Creates and pushes a git tag using any provided string (universal, not limited to semantic versioning).
-- **Inputs:** `version`, `tag_prefix`, `tag_annotation`, `tag_branches`
-- **Docs:** No dedicated doc file; see workflow header for details.
 
----
+### 7. generate-changelog-generic-release.yml
 
+- **Purpose:** Generates and optionally commits a changelog using conventional-changelog-cli. Supports custom presets, file paths, release counts, and tagging.
 ## Usage
 
 - Each workflow is designed for reusability via `workflow_call` and can be referenced from other workflows in your repository or organization.

@@ -1,0 +1,225 @@
+# =============================================================================
+# Generate Changelog (Generic Release)
+# Reusable workflow for generating and optionally committing a changelog using
+# conventional-changelog-cli. Follows project boilerplate for clarity and reuse.
+# -----------------------------------------------------------------------------
+# Inputs:
+#   node_version (string, optional): Node.js version for changelog tooling (default: '20')
+#   changelog_preset (string, optional): Conventional changelog preset (default: 'angular')
+#   changelog_file (string, optional): Path to changelog file (default: 'CHANGELOG.md')
+#   commit_changelog (boolean, optional): Automatically commit and push changelog updates (default: true)
+#   tag_name (string, optional): Git tag name for release-specific changelog (default: '')
+#   release_count (number, optional): Number of releases to include in changelog (default: 0 = all)
+#   skip_ci (boolean, optional): Add [skip ci] to commit message (default: true)
+# Secrets:
+#   GITHUB_TOKEN: Used for repository authentication (provided by GitHub)
+# Outputs:
+#   changelog_updated: Whether changelog was updated
+#   changelog_path: Path to the updated changelog file
+# =============================================================================
+
+name: Generate Changelog (Generic Release)
+
+on:
+  workflow_call:
+    inputs:
+      node_version:
+        description: 'Node.js version for changelog tooling'
+        required: false
+        default: '20'
+        type: string
+      changelog_preset:
+        description: 'Conventional changelog preset (angular, atom, codemirror, ember, eslint, express, jquery, jshint)'
+        required: false
+        default: 'angular'
+        type: string
+      changelog_file:
+        description: 'Path to changelog file'
+        required: false
+        default: 'CHANGELOG.md'
+        type: string
+      commit_changelog:
+        description: 'Automatically commit and push changelog updates'
+        required: false
+        default: true
+        type: boolean
+      tag_name:
+        description: 'Git tag name for release-specific changelog (optional)'
+        required: false
+        default: ''
+        type: string
+      release_count:
+        description: 'Number of releases to include in changelog (-1 = all)'
+        required: false
+        default: -1
+        type: number
+      skip_ci:
+        description: 'Add [skip ci] to commit message'
+        required: false
+        default: true
+        type: boolean
+
+
+permissions:
+  contents: write
+
+jobs:
+  generate-changelog:
+    name: Generate Changelog
+    runs-on: ubuntu-latest
+    outputs:
+      changelog_updated: ${{ steps.generate.outputs.changelog_updated }}
+      changelog_path: ${{ inputs.changelog_file }}
+    steps:
+      # Checkout code
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      # Setup Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node_version }}
+
+      # Install Conventional Changelog CLI
+      - name: Install Conventional Changelog CLI
+        run: npm install -g conventional-changelog-cli
+
+      # Backup Existing Changelog
+      - name: Backup Existing Changelog
+        run: |
+          if [[ -f "${{ inputs.changelog_file }}" ]]; then
+            cp "${{ inputs.changelog_file }}" "${{ inputs.changelog_file }}.backup"
+            echo "📄 Backed up existing changelog"
+          else
+            echo "📄 No existing changelog found, will create new one"
+          fi
+
+      # Generate Changelog
+      - name: Generate Changelog
+        id: generate
+        run: |
+          echo "Generating changelog with preset: ${{ inputs.changelog_preset }}"
+
+
+          # Build up arguments for conventional-changelog
+          changelog_args=(-p "${{ inputs.changelog_preset }}" -i "${{ inputs.changelog_file }}" -s)
+
+          # Add release count if specified
+          if [[ "${{ inputs.release_count }}" != "0" ]]; then
+            changelog_args+=(-r "${{ inputs.release_count }}")
+          fi
+
+          # Add tag name if specified
+          if [[ -n "${{ inputs.tag_name }}" ]]; then
+            changelog_args+=(--tag-prefix "" --preset "${{ inputs.changelog_preset }}" --tag "${{ inputs.tag_name }}")
+            changelog_cmd="$changelog_cmd --tag-prefix '' --tag ${{ inputs.tag_name }}"
+          fi
+
+          echo "Running: conventional-changelog ${changelog_args[@]}"
+          conventional-changelog "${changelog_args[@]}"
+
+          # Check if changelog was actually updated
+          if [[ -f "${{ inputs.changelog_file }}.backup" ]]; then
+            if diff -q "${{ inputs.changelog_file }}" "${{ inputs.changelog_file }}.backup" > /dev/null; then
+              echo "changelog_updated=false" >> $GITHUB_OUTPUT
+              echo "📄 No changes detected in changelog"
+            else
+              echo "changelog_updated=true" >> $GITHUB_OUTPUT
+              echo "📄 Changelog updated with new content"
+            fi
+          else
+            echo "changelog_updated=true" >> $GITHUB_OUTPUT
+            echo "📄 New changelog created"
+          fi
+
+      # Validate Changelog Format
+      - name: Validate Changelog Format
+        if: steps.generate.outputs.changelog_updated == 'true'
+        run: |
+          echo "Validating changelog format..."
+          if [[ -f "${{ inputs.changelog_file }}" ]]; then
+            echo "✅ Changelog file exists"
+
+            # Check if file has content
+            if [[ -s "${{ inputs.changelog_file }}" ]]; then
+              echo "✅ Changelog has content"
+              echo "First 10 lines of changelog:"
+              head -10 "${{ inputs.changelog_file }}"
+            else
+              echo "❌ Changelog is empty"
+              exit 1
+            fi
+          else
+            echo "❌ Changelog file not found"
+            exit 1
+          fi
+
+      # Configure Git
+      - name: Configure Git
+        if: steps.generate.outputs.changelog_updated == 'true' && inputs.commit_changelog
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+
+      # Commit and Push Changelog
+      - name: Commit and Push Changelog
+        if: steps.generate.outputs.changelog_updated == 'true' && inputs.commit_changelog
+        run: |
+          echo "Committing changelog updates..."
+          git add "${{ inputs.changelog_file }}"
+
+          # Build commit message
+          commit_msg="chore: update changelog"
+          if [[ -n "${{ inputs.tag_name }}" ]]; then
+            commit_msg="$commit_msg for ${{ inputs.tag_name }}"
+          fi
+          if [[ "${{ inputs.skip_ci }}" == "true" ]]; then
+            commit_msg="$commit_msg [skip ci]"
+          fi
+
+          if git diff --staged --quiet; then
+            echo "📄 No staged changes to commit"
+          else
+            git commit -m "$commit_msg"
+            git push origin ${{ github.ref_name }}
+            echo "✅ Changelog committed and pushed"
+          fi
+
+      # Upload Changelog Artifact
+      - name: Upload Changelog Artifact
+        if: steps.generate.outputs.changelog_updated == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: changelog-${{ github.run_id }}
+          path: ${{ inputs.changelog_file }}
+          retention-days: 30
+
+      # Cleanup Backup
+      - name: Cleanup Backup
+        if: always()
+        run: |
+          if [[ -f "${{ inputs.changelog_file }}.backup" ]]; then
+            rm "${{ inputs.changelog_file }}.backup"
+            echo "🧹 Cleaned up backup file"
+          fi
+
+      # Changelog Generation Summary
+      - name: Changelog Generation Summary
+        if: always()
+        run: |
+          echo "## 📝 Changelog Generation Summary" >> $GITHUB_STEP_SUMMARY
+          echo "- **Updated**: ${{ steps.generate.outputs.changelog_updated == 'true' && '✅ Yes' || '📄 No changes' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Preset**: ${{ inputs.changelog_preset }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **File**: ${{ inputs.changelog_file }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Auto Commit**: ${{ inputs.commit_changelog }}" >> $GITHUB_STEP_SUMMARY
+          if [[ -n "${{ inputs.tag_name }}" ]]; then
+            echo "- **Tag**: ${{ inputs.tag_name }}" >> $GITHUB_STEP_SUMMARY
+          fi
+          if [[ "${{ inputs.release_count }}" != "0" ]]; then
+            echo "- **Release Count**: ${{ inputs.release_count }}" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "- **Node.js Version**: ${{ inputs.node_version }}" >> $GITHUB_STEP_SUMMARY
