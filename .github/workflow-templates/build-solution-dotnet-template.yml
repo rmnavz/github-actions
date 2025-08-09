@@ -1,29 +1,41 @@
 # ============================================================================
-# Build Solution (.NET CI) - Workflow Template
-# This template sets up a reusable .NET solution build workflow.
+# Build .NET Solution - Workflow Template
+# Builds a .NET solution with dependency caching and artifact management.
+# ----------------------------------------------------------------------------
+# Inputs:
+#   dotnet_version (string, optional): .NET SDK version (default: 8.0.x)
+#   project_path (string, optional): Path to solution/project (default: auto-discover)
+#   artifact_name (string, optional): Name for build artifacts (default: build-artifacts)
+#   artifact_paths (string, optional): Paths to include in artifacts (default: **/bin/Release/)
+#   artifact_retention_days (number, optional): Days to retain artifacts (default: 7)
+#   upload_artifacts (boolean, optional): Whether to upload artifacts (default: true)
+# Outputs:
+#   build_status: Success/failure status of the build
+#   artifact_url: URL to download the build artifacts
+# Documentation: See docs/build-solution-dotnet.md for more details.
 # ============================================================================
-name: Build Solution (.NET CI) (Template)
+name: Build .NET Solution (Template)
 
 on:
   workflow_call:
     inputs:
       dotnet_version:
-        description: '.NET SDK version (e.g., 8.0.x)'
+        description: '.NET SDK version to use'
         required: false
         default: '8.0.x'
         type: string
       project_path:
-        description: 'Path to solution/project (blank = auto-discover)'
+        description: 'Path to solution/project (blank for auto-discovery)'
         required: false
         default: ''
         type: string
       artifact_name:
-        description: 'Name for uploaded artifact'
+        description: 'Name for the build artifacts'
         required: false
         default: 'build-artifacts'
         type: string
       artifact_paths:
-        description: 'Paths to include in artifact'
+        description: 'Paths to include in artifacts'
         required: false
         default: '**/bin/Release/'
         type: string

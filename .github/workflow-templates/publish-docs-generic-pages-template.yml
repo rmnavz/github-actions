@@ -1,0 +1,47 @@
+
+# ============================================================================
+# Publish Docs (Generic Pages) - Workflow Template
+# Publishes static documentation (e.g., DocFX) to GitHub Pages, supporting both
+# .NET and non-.NET projects with DocFX configurations.
+# ----------------------------------------------------------------------------
+# Inputs:
+#   docfx_project_path (string, required): Path to DocFX project directory
+#   dotnet_version (string, optional): .NET SDK version (default: 8.x)
+#   docfx_version (string, optional): DocFX tool version (default: 2.78.3)
+# Outputs:
+#   page_url: URL of the deployed GitHub Pages
+# Requirements:
+#   - Valid docfx.json in specified directory
+#   - GitHub Pages enabled in repository
+# Documentation: See docs/publish-docs-generic-pages.md for more details.
+# ============================================================================
+
+name: "Publish Docs (Generic Pages) (Template)"
+
+on:
+  workflow_call:
+    inputs:
+      # Required inputs first
+      docfx_project_path:
+        description: 'Path to the DocFX project directory (relative to repo root)'
+        required: true
+        type: string
+      # Optional inputs with defaults
+      dotnet_version:
+        description: '.NET SDK version'
+        required: false
+        default: '8.x'
+        type: string
+      docfx_version:
+        description: 'DocFX tool version. Allows pinning for security and reproducibility'
+        required: false
+        default: '2.78.3'
+        type: string
+
+jobs:
+  workflow:
+    uses: ./.github/workflows/publish-docs-generic-pages.yml
+    with:
+      docfx_project_path: ${{ inputs.docfx_project_path }}
+      dotnet_version: ${{ inputs.dotnet_version }}
+      docfx_version: ${{ inputs.docfx_version }}

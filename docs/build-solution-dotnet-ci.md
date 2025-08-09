@@ -1,12 +1,14 @@
-# Build Solution (.NET CI) Workflow
+# Build .NET Solution
 
-This workflow builds a .NET solution or project, caches dependencies, and optionally uploads build artifacts. It is designed for universal use via `workflow_call` in other repositories.
+This workflow builds a .NET solution or project with dependency caching and artifact management. It is designed for universal use and workflow reusability.
 
-## Purpose
+## Features
 
-- Build .NET solutions or projects
-- Cache NuGet packages and build outputs
-- Upload build artifacts for downstream jobs
+- Builds .NET solutions or projects with configurable SDK version
+- Smart dependency caching for faster builds
+- Flexible artifact management with configurable retention
+- Auto-discovery of solution/project files
+- Support for custom build paths and configurations
 
 ## Inputs
 

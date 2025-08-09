@@ -1,29 +1,41 @@
 # ============================================================================
-# Test Solution (.NET Unit Tests) - Workflow Template
-# This template sets up a reusable .NET unit test workflow.
+# Run .NET Tests - Workflow Template
+# Runs unit tests for a .NET solution with configurable test reporting.
+# ----------------------------------------------------------------------------
+# Inputs:
+#   dotnet_version (string, optional): .NET SDK version (default: 8.0.x)
+#   project_path (string, optional): Path to solution/project (default: auto-discover)
+#   use_build_artifact (boolean, optional): Use build artifact from previous job (default: false)
+#   build_artifact_name (string, optional): Name of build artifact to use (default: build-artifacts)
+#   test_filter (string, optional): Test filter criteria (default: Category!=Integration)
+#   collect_coverage (boolean, optional): Collect code coverage (default: true)
+# Outputs:
+#   test_results: Summary of test execution results
+#   coverage_report: Code coverage analysis report
+# Documentation: See docs/test-solution-dotnet-unit-tests.md for more details.
 # ============================================================================
-name: Test Solution (.NET Unit Tests) (Template)
+name: Run .NET Tests (Template)
 
 on:
   workflow_call:
     inputs:
       dotnet_version:
-        description: '.NET SDK version (e.g., 8.0.x)'
+        description: '.NET SDK version to use'
         required: false
         default: '8.0.x'
         type: string
       project_path:
-        description: 'Path to solution/project (blank = auto-discover)'
+        description: 'Path to solution/project (blank for auto-discovery)'
         required: false
         default: ''
         type: string
       use_build_artifact:
-        description: 'Download and use build artifact from previous build job?'
+        description: 'Use build artifact from previous job'
         required: false
         default: false
         type: boolean
       build_artifact_name:
-        description: 'Name of the build artifact to download (if used)'
+        description: 'Name of build artifact to use'
         required: false
         default: 'build-artifacts'
         type: string

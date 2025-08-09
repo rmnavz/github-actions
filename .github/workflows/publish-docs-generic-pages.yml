@@ -1,0 +1,105 @@
+# ============================================================================
+# Publish Docs (Generic Pages)
+# Publishes static documentation (e.g., DocFX) to GitHub Pages.
+# Designed for universal use and workflow reusability.
+# ----------------------------------------------------------------------------
+# Inputs:
+#   docfx_project_path (string, required): Path to DocFX project directory
+#   dotnet_version (string, optional): .NET SDK version (default: 8.x)
+#   docfx_version (string, optional): DocFX tool version (default: 2.78.3)
+# Outputs:
+#   page_url: URL of the deployed GitHub Pages site
+# Usage Example:
+#   jobs:
+#     publish-docs:
+#       uses: your-org/github-actions/.github/workflows/publish-docs-generic-pages.yml@v1.0.0
+#       with:
+#         docfx_project_path: 'docs'
+#         dotnet_version: '8.x'
+#         docfx_version: '2.78.3'
+# Documentation: See docs/publish-docs-generic-pages.md for more details.
+# ============================================================================
+
+name: "Publish Docs (Generic Pages)"
+
+on:
+  workflow_call:
+    inputs:
+      # Required inputs first
+      docfx_project_path:
+        description: 'Path to the DocFX project directory (relative to repo root)'
+        required: true
+        type: string
+      dotnet_version:
+        description: '.NET SDK version'
+        required: false
+        default: '8.x'
+        type: string
+      docfx_version:
+        description: 'DocFX tool version'
+        required: false
+        default: '2.78.3'
+        type: string
+    outputs:
+      page_url:
+        description: 'URL of the deployed GitHub Pages site'
+        value: ${{ jobs.publish-docs.outputs.page_url }}
+
+permissions:
+  actions: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  publish-docs:
+    name: Publish Documentation to GitHub Pages
+    runs-on: ubuntu-latest
+    outputs:
+      page_url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ inputs.dotnet_version }}
+
+
+      - name: Validate docfx_project_path
+        run: |
+          # Fail if path is absolute
+          if [[ "${{ inputs.docfx_project_path }}" = /* ]]; then
+            echo "Error: docfx_project_path must be a relative path."
+            exit 1
+          fi
+          # Fail if path contains '..' or suspicious characters
+          if [[ "${{ inputs.docfx_project_path }}" == *".."* ]] || [[ "${{ inputs.docfx_project_path }}" =~ [';|$`&() \	'] ]]; then
+            echo "Error: docfx_project_path contains invalid characters."
+            exit 1
+          fi
+          # Fail if directory does not exist or docfx.json is missing
+          if [ ! -f "${{ inputs.docfx_project_path }}/docfx.json" ]; then
+            echo "Error: docfx.json not found in docfx_project_path."
+            exit 1
+          fi
+
+      # Install DocFX at the specified version for reproducibility and security
+      - name: Install DocFX
+        run: dotnet tool update -g docfx --version ${{ inputs.docfx_version }}
+
+      - name: Build Documentation
+        run: docfx ${{ inputs.docfx_project_path }}/docfx.json
+
+      - name: Upload Pages Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '${{ inputs.docfx_project_path }}/_site'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

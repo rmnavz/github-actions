@@ -1,6 +1,17 @@
 # ============================================================================
 # Tag Git (Generic Release) - Workflow Template
-# This template sets up a reusable git tag workflow.
+# Creates and pushes git tags using any provided string, supports annotated tags
+# and multi-branch tagging.
+# ----------------------------------------------------------------------------
+# Inputs:
+#   version (string, required): The string to use for the tag (e.g. 1.2.3)
+#   tag_prefix (string, optional): Prefix for the tag name (default: v)
+#   tag_annotation (string, optional): Annotated tag message
+#   tag_branches (string, optional): Comma-separated list of branches/tags to tag on
+#                                   (default: main,develop,release/)
+# Outputs:
+#   None
+# Documentation: See docs/tag-git-generic-release.md for more details.
 # ============================================================================
 name: Tag Git (Generic Release) (Template)
 

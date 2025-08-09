@@ -1,32 +1,33 @@
 # ============================================================================
-# Documentation: See docs/build-package-dotnet-ci.md
-# Build Package (.NET CI)
-# Builds and packages a .NET project for any versioning scheme. Uploads NuGet
-# packages as artifacts. Designed for universal use and workflow reusability.
+# Build .NET Package
+# Builds and packages a .NET project with configurable versioning and artifacts.
+# Designed for universal use and workflow reusability.
 # ----------------------------------------------------------------------------
 # Inputs:
-#   release_version (string, required): Release version (e.g., 1.2.3, 2025.08.08, release-42)
-#   dotnet_version  (string, optional): .NET SDK version (default: 8.0.x)
-#   project_path    (string, optional): Path to solution/project (default: ".")
-#   artifact_name   (string, optional): Name for uploaded artifact (default: nuget-packages)
-#   artifact_paths  (string, optional): Paths to include in artifact (default: ./artifacts/*.nupkg)
-#   artifact_retention_days (number, optional): Days to keep artifact (default: 7)
-#   upload_artifacts (boolean, optional): Whether to upload build artifacts (default: true)
+#   release_version (string, required): Version number (e.g., 1.2.3)
+#   dotnet_version (string, optional): .NET SDK version (default: 8.0.x)
+#   project_path (string, optional): Path to solution/project (default: auto-discover)
+#   artifact_name (string, optional): Name for package artifacts (default: nuget-packages)
+#   artifact_paths (string, optional): Paths to package outputs (default: **/bin/Release/*.nupkg)
+#   artifact_retention_days (number, optional): Days to retain artifacts (default: 7)
 # Outputs:
-#   nuget_packages  (artifact): The produced NuGet package files
-
-# Notes & Best Practices:
-# - Use clear, descriptive names for jobs, steps, and inputs.
-# - Document all inputs, outputs, and secrets at the top.
-# - Use 'workflow_call' for reusability and composability.
-# - Use 'id:' for steps whose outputs are needed later.
-# - Pin action versions for reproducibility.
-
-name: Build Package (.NET CI)
+#   package_version: The version of the built package
+#   artifact_url: URL to download the package artifacts
+# Usage Example:
+#   jobs:
+#     build-package:
+#       uses: rmnavz/github-actions/.github/workflows/build-package-dotnet-ci.yml@v1.0.0
+#       with:
+#         release_version: '1.2.3'
+#         project_path: 'src/MyPackage'
+# Documentation: See docs/build-package-dotnet-ci.md for more details.
+# ============================================================================
+name: Build .NET Package
 
 on:
   workflow_call:
     inputs:
+      # Required inputs first
       release_version:
         description: 'Release version (e.g., 1.2.3, 2025.08.08, release-42)'
         required: true

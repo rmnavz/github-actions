@@ -1,11 +1,15 @@
-# Build Package (.NET CI) Workflow
+# Build .NET Package
 
-This workflow builds and packages a .NET project, uploading NuGet packages as artifacts. Designed for universal use and workflow reusability.
+This workflow builds and packages a .NET project with configurable versioning and artifact management. It is designed for universal use and workflow reusability.
 
-## Purpose
+## Features
 
-- Build and package .NET projects
-- Upload NuGet packages as artifacts
+- Configurable package versioning
+- Automatic NuGet package generation
+- Smart dependency caching
+- Flexible artifact management
+- Support for custom build paths
+- Build output validation
 
 ## Inputs
 

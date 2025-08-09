@@ -1,6 +1,15 @@
 # ============================================================================
 # .NET Security Check - Workflow Template
-# This template sets up a reusable .NET security check workflow.
+# Performs security checks for .NET projects including package vulnerabilities
+# and optional CodeQL analysis.
+# ----------------------------------------------------------------------------
+# Inputs:
+#   dotnet_version (string, optional): .NET SDK version (default: 8.0.x)
+#   run_vulnerability_check (boolean, optional): Run package vulnerability check (default: true)
+#   run_codeql (boolean, optional): Run CodeQL analysis (default: false)
+# Outputs:
+#   vulnerability_status: Status of vulnerability check (found/none)
+# Documentation: See docs/dotnet-security-check.md for more details.
 # ============================================================================
 name: .NET Security Check (Template)
 

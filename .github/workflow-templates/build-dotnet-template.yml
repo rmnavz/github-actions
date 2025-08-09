@@ -1,24 +1,57 @@
 # ============================================================================
 # Build .NET Project - Workflow Template
-# This template can be used to quickly set up a reusable .NET build workflow
-# in any repository. It leverages the reusable workflow in this repo.
+# Builds a .NET project using a reusable workflow with configurable settings.
+# ----------------------------------------------------------------------------
+# Inputs:
+#   dotnet_version (string, required): .NET SDK version to use (e.g., 8.0.x)
+#   project_path (string, required): Path to the project or solution file
+#   artifact_name (string, optional): Name for the build artifacts (default: build-artifacts)
+#   artifact_paths (string, optional): Paths to artifacts to upload (default: **/bin/Release/)
+#   artifact_retention_days (number, optional): Days to retain artifacts (default: 7)
+#   upload_artifacts (boolean, optional): Whether to upload artifacts (default: true)
+# Documentation: See docs/build-dotnet.md for more details.
 # ============================================================================
 name: Build .NET Project (Template)
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+  workflow_call:
+    inputs:
+      dotnet_version:
+        description: '.NET SDK version to use'
+        required: true
+        type: string
+      project_path:
+        description: 'Path to the project or solution file'
+        required: true
+        type: string
+      artifact_name:
+        description: 'Name for the build artifacts'
+        required: false
+        default: 'build-artifacts'
+        type: string
+      artifact_paths:
+        description: 'Paths to artifacts to upload'
+        required: false
+        default: '**/bin/Release/'
+        type: string
+      artifact_retention_days:
+        description: 'Days to retain artifacts'
+        required: false
+        default: 7
+        type: number
+      upload_artifacts:
+        description: 'Whether to upload artifacts'
+        required: false
+        default: true
+        type: boolean
 
 jobs:
-  build:
-    uses: ./.github/workflows/build-solution-dotnet-ci.yml
+  workflow:
+    uses: ./.github/workflows/build-dotnet.yml
     with:
-      dotnet_version: 8.0.x
-      project_path: ''
-      artifact_name: build-artifacts
-      artifact_paths: |
-        **/bin/Release/
-      artifact_retention_days: 7
-      upload_artifacts: true
+      dotnet_version: ${{ inputs.dotnet_version }}
+      project_path: ${{ inputs.project_path }}
+      artifact_name: ${{ inputs.artifact_name }}
+      artifact_paths: ${{ inputs.artifact_paths }}
+      artifact_retention_days: ${{ inputs.artifact_retention_days }}
+      upload_artifacts: ${{ inputs.upload_artifacts }}

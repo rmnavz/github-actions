@@ -1,7 +1,55 @@
 {
-  "name": "Build Solution (.NET CI)",
-  "description": "Reusable workflow template for building .NET solutions or projects with caching and optional artifact upload.",
+  "name": "Build .NET Solution",
+  "description": "Builds a .NET solution with dependency caching and artifact management.",
   "iconName": "dotnet",
-  "categories": ["C#", ".NET", "ci", "build"],
-  "filePatterns": ["**/*.csproj", "**/*.sln", "Directory.Build.props", "Directory.Packages.props"]
+  "categories": [
+    "C#",
+    ".NET",
+    "Continuous Integration",
+    "Build"
+  ],
+  "filePatterns": [
+    "**/*.csproj",
+    "**/*.sln",
+    "Directory.Build.props",
+    "Directory.Packages.props"
+  ],
+  "parameters": {
+    "dotnet_version": {
+      "description": ".NET SDK version to use",
+      "required": false,
+      "default": "8.0.x",
+      "type": "string"
+    },
+    "project_path": {
+      "description": "Path to solution/project (blank for auto-discovery)",
+      "required": false,
+      "default": "",
+      "type": "string"
+    },
+    "artifact_name": {
+      "description": "Name for the build artifacts",
+      "required": false,
+      "default": "build-artifacts",
+      "type": "string"
+    },
+    "artifact_paths": {
+      "description": "Paths to include in artifacts",
+      "required": false,
+      "default": "**/bin/Release/",
+      "type": "string"
+    },
+    "artifact_retention_days": {
+      "description": "Days to retain artifacts",
+      "required": false,
+      "default": 7,
+      "type": "number"
+    },
+    "upload_artifacts": {
+      "description": "Whether to upload artifacts",
+      "required": false,
+      "default": true,
+      "type": "boolean"
+    }
+  }
 }
