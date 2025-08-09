@@ -2,12 +2,14 @@
 
 This workflow publishes static documentation (e.g., DocFX) to GitHub Pages using a reusable workflow.
 
+
 ## Features
 
 - Reusable via `workflow_call` in external repositories
 - Supports any project with a valid DocFX configuration
 - Minimal required permissions for GitHub Pages
 - Customizable .NET SDK version
+- Configurable DocFX version for security and reproducibility
 
 ## Inputs
 
@@ -15,6 +17,7 @@ This workflow publishes static documentation (e.g., DocFX) to GitHub Pages using
 |--------------------|--------|----------|---------|---------------------------------------------------------|
 | docfx_project_path | string | Yes      | —       | Path to the DocFX project directory (relative to root)  |
 | dotnet_version     | string | No       | 8.x     | .NET SDK version to use                                 |
+| docfx_version      | string | No       | 2.78.3  | DocFX tool version to use. Allows pinning for security and reproducibility. |
 
 ## Outputs
 
@@ -30,7 +33,8 @@ jobs:
     uses: your-org/github-actions/.github/workflows/publish-docs-generic-pages.yml@v1.0.0
     with:
       docfx_project_path: 'docs'
-      dotnet_version: '8.x'
+  dotnet_version: '8.x'
+  docfx_version: '2.78.3'
 ```
 
 ## Notes

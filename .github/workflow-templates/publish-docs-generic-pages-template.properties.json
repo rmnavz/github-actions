@@ -12,6 +12,12 @@
       "required": false,
       "default": "8.x",
       "type": "string"
+    },
+    "docfx_version": {
+      "description": "DocFX tool version (default: 2.78.3). Allows pinning for security and reproducibility.",
+      "required": false,
+      "default": "2.78.3",
+      "type": "string"
     }
   },
   "example_usage": {

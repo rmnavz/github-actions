@@ -9,6 +9,7 @@
 #       with:
 #         docfx_project_path: 'docs'
 #         dotnet_version: '8.x'
+#         docfx_version: '2.78.3'
 # ============================================================================
 
 name: Publish Docs (Generic Pages) Template
@@ -22,10 +23,17 @@ parameters:
     description: Path to the DocFX project directory (relative to repo root)
     required: true
     type: string
+
   dotnet_version:
     description: .NET SDK version
     required: false
     default: '8.x'
+    type: string
+
+  docfx_version:
+    description: DocFX tool version (default: 2.78.3). Allows pinning for security and reproducibility.
+    required: false
+    default: '2.78.3'
     type: string
 
 # Example job usage

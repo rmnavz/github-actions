@@ -6,6 +6,7 @@
 # Inputs:
 #   docfx_project_path (string, required): Path to the DocFX project directory (relative to repo root)
 #   dotnet_version (string, optional): .NET SDK version (default: 8.x)
+#   docfx_version (string, optional): DocFX tool version (default: 2.78.3)
 # Outputs:
 #   page_url: URL of the deployed GitHub Pages site
 # Usage Example:
@@ -14,6 +15,7 @@
 #       uses: your-org/github-actions/.github/workflows/publish-docs-generic-pages.yml@v1.0.0
 #       with:
 #         docfx_project_path: 'docs'
+#   docfx_version: Version of DocFX to install (default: 2.78.3). Allows pinning for security and reproducibility.
 # ============================================================================
 
 name: Publish Docs (Generic Pages)
@@ -29,6 +31,11 @@ on:
         description: '.NET SDK version'
         required: false
         default: '8.x'
+        type: string
+      docfx_version:
+        description: 'DocFX tool version'
+        required: false
+        default: '2.78.3'
         type: string
     outputs:
       page_url:
@@ -77,6 +84,11 @@ jobs:
             echo "Error: docfx.json not found in docfx_project_path."
             exit 1
           fi
+
+      # Install DocFX at the specified version for reproducibility and security
+      - name: Install DocFX
+        run: dotnet tool update -g docfx --version ${{ inputs.docfx_version }}
+
       - name: Build Documentation
         run: docfx ${{ inputs.docfx_project_path }}/docfx.json
 
