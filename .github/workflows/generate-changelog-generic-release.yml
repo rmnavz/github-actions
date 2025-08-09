@@ -121,7 +121,7 @@ jobs:
 
           # Add tag name if specified
           if [[ -n "${{ inputs.tag_name }}" ]]; then
-            changelog_cmd="$changelog_cmd --tag-prefix '' --preset ${{ inputs.changelog_preset }} --tag ${{ inputs.tag_name }}"
+            changelog_cmd="$changelog_cmd --tag-prefix '' --tag ${{ inputs.tag_name }}"
           fi
 
           echo "Running: $changelog_cmd"
