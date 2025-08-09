@@ -1,89 +1,81 @@
 # ============================================================================
-# Workflow Boilerplate
-# A boilerplate for GitHub Actions workflows, designed for maximum reusability
-# and clarity. Use this as a starting point for any CI/CD process.
+# WORKFLOW_NAME
+# One-line description of what this workflow does
+# Designed for universal use and workflow reusability.
 # ----------------------------------------------------------------------------
 # Inputs:
-#   input_name (type, required/optional): Description
-#   ...
-# Secrets:
-#   SECRET_NAME: Description
+#   required_input (string, required): Description of required input
+#   optional_input (string, optional): Description of optional input (default: default-value)
+#   enable_feature (boolean, optional): Enable optional feature (default: false)
+#   retention_days (number, optional): Days to retain artifacts (default: 7)
 # Outputs:
-#   output_name: Description
+#   job_output: Output from the main job
+# Usage Example:
+#   jobs:
+#     workflow_job:
+#       uses: your-org/github-actions/.github/workflows/workflow-name.yml@v1.0.0
+#       with:
+#         required_input: 'value'
+#         optional_input: 'custom-value'
+# Documentation: See docs/workflow-name.md for more details.
 # ============================================================================
-
-# This boilerplate is designed for maximum reusability and clarity.
-# - Use as a base for build, test, deploy, or any CI/CD process.
-# - Add or remove jobs/steps as needed for your use case.
-# - Supports environment variables, matrix strategies, and caching.
-
-
-name: Workflow Boilerplate
-
-# Update the name for your specific workflow purpose.
+name: WORKFLOW_NAME
 
 on:
   workflow_call:
     inputs:
-      # Example input: string type
-      example_input:
-        description: 'Describe what this input does.'
+      required_input:
+        description: 'Clear description of what this input does and how it affects the workflow'
+        required: true
+        type: string
+      optional_input:
+        description: 'Description of optional input with its default behavior'
         required: false
         default: 'default-value'
         type: string
-      # Example input: boolean type
       enable_feature:
-        description: 'Enable or disable a feature.'
+        description: 'Enable optional feature'
         required: false
         default: false
         type: boolean
-      # Example input: number type
       retention_days:
-        description: 'Number of days to retain artifacts.'
+        description: 'Days to retain artifacts'
         required: false
         default: 7
         type: number
-      # Add more inputs as needed
-      # Add environment or matrix-related inputs if required
+
     secrets:
-      # Example secret
-      EXAMPLE_SECRET:
-        description: 'Secret used for authentication.'
+      WORKFLOW_SECRET:
+        description: 'Description of what this secret is used for'
         required: false
+
     outputs:
-      # Example output
-      example_output:
-        description: 'Output value from a step.'
-        value: ${{ jobs.main.outputs.example_output }}
+      job_output:
+        description: 'Output from the main job'
+        value: ${{ jobs.main.outputs.job_output }}
+
+env:
+  EXAMPLE_VAR: 'value'
 
 jobs:
-
-  # Example: single job with matrix and environment
   main:
     name: Main Job
     runs-on: ubuntu-latest
-    # Example matrix strategy for multi-version or multi-os testing
     strategy:
       matrix:
         node-version: [18.x, 20.x]
         os: [ubuntu-latest, windows-latest]
-    env:
-      # Example environment variable
-      GLOBAL_ENV_VAR: ${{ inputs.example_input }}
     outputs:
-      example_output: ${{ steps.example_step.outputs.example_output }}
+      job_output: ${{ steps.example_step.outputs.job_output }}
     steps:
-      # Checkout code
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Example: Setup Node.js (replace with setup-dotnet, python, etc. as needed)
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
 
-      # Example: Cache dependencies (universal pattern)
       - name: Cache dependencies
         uses: actions/cache@v4
         with:
@@ -92,18 +84,15 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-
 
-      # Example step with output
       - name: Example step
         id: example_step
         run: |
-          echo "example_output=42" >> "$GITHUB_OUTPUT"
+          echo "job_output=42" >> "$GITHUB_OUTPUT"
 
-      # Conditional step example
       - name: Conditional step
         if: ${{ inputs.enable_feature }}
         run: echo "Feature enabled!"
 
-      # Upload artifact example
       - name: Upload artifact
         if: ${{ always() }}
         uses: actions/upload-artifact@v4
@@ -112,15 +101,21 @@ jobs:
           path: ./path/to/artifact
           retention-days: ${{ inputs.retention_days }}
 
+  secondary:
+    needs: main
+    runs-on: ubuntu-latest
+    steps:
+      - name: Secondary step
+        run: echo "This job runs after main job"
+
 # Notes & Best Practices:
-# - Use clear, descriptive names for jobs, steps, and inputs.
-# - Document all inputs, outputs, secrets, and environment variables at the top.
-# - Use 'workflow_call' for reusability and composability.
-# - Use 'if:' conditions for optional/conditional steps.
-# - Prefer 'always()' for artifact upload to ensure results are saved even on failure.
-# - Use 'id:' for steps whose outputs are needed later.
-# - Keep secrets to a minimum and document their use and scope.
-# - Add caching, matrix, or environment strategies for performance and flexibility.
-# - Use environment variables for global config, and matrix for multi-version/multi-os testing.
-# - Replace Node.js steps with setup-dotnet, setup-python, etc. as needed for your stack.
-# - Remove or expand jobs/steps to fit your workflow's requirements.
+# - Use clear, descriptive names for jobs, steps, and inputs
+# - Document all inputs, outputs, secrets, and environment variables at the top
+# - Use 'workflow_call' for reusability and composability
+# - Use 'if:' conditions for optional/conditional steps
+# - Prefer 'always()' for artifact upload to ensure results are saved even on failure
+# - Use 'id:' for steps whose outputs are needed later
+# - Keep secrets to a minimum and document their use and scope
+# - Add caching, matrix, or environment strategies for performance and flexibility
+# - Use environment variables for global config, and matrix for multi-version testing
+# - Replace Node.js steps with setup-dotnet, setup-python, etc. as needed for your stack

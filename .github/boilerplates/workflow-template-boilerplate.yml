@@ -1,0 +1,37 @@
+# ============================================================================
+# WORKFLOW_NAME - Workflow Template
+# One-line description of what this workflow template does
+# ============================================================================
+
+name: WORKFLOW_NAME (Template)
+
+on:
+  workflow_call:
+    inputs:
+      # Required inputs first
+      required_input:
+        description: 'Clear description of the required input'
+        required: true
+        type: string
+      # Optional inputs with defaults
+      optional_input:
+        description: 'Clear description with default value information'
+        required: false
+        default: 'default-value'
+        type: string
+
+    # Only include if needed
+    secrets:
+      SECRET_NAME:
+        description: 'Description of the secret'
+        required: false
+
+jobs:
+  main:
+    uses: ./.github/workflows/workflow-name.yml
+    with:
+      required_input: ${{ inputs.required_input }}
+      optional_input: ${{ inputs.optional_input }}
+    # Include secrets section if needed
+    secrets:
+      SECRET_NAME: ${{ secrets.SECRET_NAME }}

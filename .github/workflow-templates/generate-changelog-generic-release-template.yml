@@ -1,3 +1,21 @@
+# ============================================================================
+# Generate Changelog (Generic Release) - Workflow Template
+# Generates and optionally commits a changelog using conventional-changelog-cli
+# based on commit history.
+# ----------------------------------------------------------------------------
+# Inputs:
+#   node_version (string, optional): Node.js version for changelog (default: 20)
+#   changelog_preset (string, optional): Conventional changelog preset (default: angular)
+#   changelog_file (string, optional): Path to changelog file (default: CHANGELOG.md)
+#   commit_changelog (boolean, optional): Auto commit changes (default: true)
+#   tag_name (string, optional): Git tag for release-specific changelog
+#   release_count (number, optional): Releases to include, -1=all (default: -1)
+#   skip_ci (boolean, optional): Add [skip ci] to commit (default: true)
+# Outputs:
+#   changelog_updated: Whether changelog was updated (true/false)
+#   changelog_path: Path to the updated changelog file
+# Documentation: See docs/generate-changelog-generic-release.md for more details.
+# ============================================================================
 name: Generate Changelog (Generic Release) (Template)
 
 on:

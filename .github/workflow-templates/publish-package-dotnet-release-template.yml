@@ -1,6 +1,19 @@
 # ============================================================================
 # Publish Package (.NET Release) - Workflow Template
-# This template sets up a reusable .NET package publish workflow.
+# Publishes NuGet packages to NuGet.org and creates GitHub releases with release
+# notes, including optional test results.
+# ----------------------------------------------------------------------------
+# Inputs:
+#   release_version (string, required): Release version (e.g., 1.2.3)
+#   prerelease (boolean, optional): Is this a prerelease? (default: false)
+#   include_test_results (boolean, optional): Include test results (default: true)
+#   artifact_name (string, optional): NuGet artifact name (default: nuget-packages)
+# Secrets Required:
+#   NUGET_API_KEY: API key for publishing to NuGet.org
+#   GITHUB_TOKEN: GitHub token for creating releases
+# Outputs:
+#   release_url: URL of the created GitHub release
+# Documentation: See docs/publish-package-dotnet-release.md for more details.
 # ============================================================================
 name: Publish Package (.NET Release) (Template)
 

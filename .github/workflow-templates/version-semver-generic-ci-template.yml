@@ -1,6 +1,18 @@
 # ============================================================================
 # Version (Semantic, Generic CI) - Workflow Template
-# This template sets up a reusable semantic versioning workflow.
+# Calculates semantic version using GitVersion for CI pipelines without creating
+# or pushing tags.
+# ----------------------------------------------------------------------------
+# Inputs:
+#   gitversion_version (string, optional): GitVersion version to use (default: 5.x)
+#   gitversion_config (string, optional): Path to gitversion.yml config file
+# Outputs:
+#   semver: The calculated semver
+#   major: Major version number
+#   minor: Minor version number
+#   patch: Patch version number
+#   fullSemVer: Full semantic version
+# Documentation: See docs/version-semver-generic-ci.md for more details.
 # ============================================================================
 name: Version (Semantic, Generic CI) (Template)
 

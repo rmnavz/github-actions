@@ -1,0 +1,26 @@
+{
+  "name": "Workflow Name",
+  "description": "One-line description of what this workflow does",
+  "parameters": {
+    "required_input": {
+      "description": "Clear description of the required input",
+      "required": true,
+      "type": "string"
+    },
+    "optional_input": {
+      "description": "Clear description with default value information",
+      "required": false,
+      "default": "default-value",
+      "type": "string"
+    }
+  },
+  "categories": [
+    "Continuous Integration",
+    "Deployment"
+  ],
+  "filePatterns": [
+    "package.json$",
+    "^Dockerfile",
+    ".*\\.sln$"
+  ]
+}

@@ -2,8 +2,9 @@
 
 
 # ============================================================================
-# Build Solution (.NET CI)
-# Builds a .NET solution or project, caches dependencies, and (optionally) uploads build artifacts. Designed for universal use via workflow_call.
+# Build .NET Solution
+# Builds a .NET solution or project with dependency caching and artifact management.
+# Designed for universal use and workflow reusability.
 # ----------------------------------------------------------------------------
 # Inputs:
 #   dotnet_version (string, optional): .NET SDK version (default: 8.0.x)
@@ -13,7 +14,8 @@
 #   artifact_retention_days (number, optional): Days to keep artifact (default: 7)
 #   upload_artifacts (boolean, optional): Whether to upload build artifacts (default: true)
 # Outputs:
-#   build_status, artifact_url
+#   build_status: Success/failure status of the build
+#   artifact_url: URL to download the build artifacts
 # Usage Example:
 #   jobs:
 #     build-solution:
@@ -23,8 +25,7 @@
 #         project_path: 'src/MyProject.sln'
 # Documentation: See docs/build-solution-dotnet-ci.md
 # ============================================================================
-
-name: Build Solution (.NET CI)
+name: Build .NET Solution
 
 on:
   workflow_call:

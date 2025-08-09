@@ -4,7 +4,7 @@
 # Designed for universal use and workflow reusability.
 # ----------------------------------------------------------------------------
 # Inputs:
-#   docfx_project_path (string, required): Path to the DocFX project directory (relative to repo root)
+#   docfx_project_path (string, required): Path to DocFX project directory
 #   dotnet_version (string, optional): .NET SDK version (default: 8.x)
 #   docfx_version (string, optional): DocFX tool version (default: 2.78.3)
 # Outputs:
@@ -20,11 +20,12 @@
 # Documentation: See docs/publish-docs-generic-pages.md for more details.
 # ============================================================================
 
-name: Publish Docs (Generic Pages)
+name: "Publish Docs (Generic Pages)"
 
 on:
   workflow_call:
     inputs:
+      # Required inputs first
       docfx_project_path:
         description: 'Path to the DocFX project directory (relative to repo root)'
         required: true

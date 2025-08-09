@@ -1,4 +1,4 @@
-# Publish Docs (Generic Pages) Workflow
+# Publish Docs (Generic Pages)
 
 This workflow publishes static documentation (e.g., DocFX) to GitHub Pages using a reusable workflow.
 

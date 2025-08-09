@@ -1,7 +1,54 @@
 {
-  "name": "Build Package (.NET CI)",
-  "description": "Reusable workflow template for building and packaging .NET projects, uploading NuGet packages as artifacts.",
+  "name": "Build .NET Package",
+  "description": "Builds a .NET package with versioning and artifact management.",
   "iconName": "dotnet",
-  "categories": ["C#", ".NET", "ci", "package"],
-  "filePatterns": ["**/*.csproj", "**/*.sln", "./artifacts/*.nupkg"]
+  "categories": [
+    "C#",
+    ".NET",
+    "Continuous Integration",
+    "Package"
+  ],
+  "filePatterns": [
+    "**/*.csproj",
+    "**/*.sln",
+    "./artifacts/*.nupkg",
+    "Directory.Build.props"
+  ],
+  "parameters": {
+    "release_version": {
+      "description": "Version number for the package",
+      "required": true,
+      "type": "string"
+    },
+    "dotnet_version": {
+      "description": ".NET SDK version to use",
+      "required": false,
+      "default": "8.0.x",
+      "type": "string"
+    },
+    "project_path": {
+      "description": "Path to solution/project (blank for auto-discovery)",
+      "required": false,
+      "default": ".",
+      "type": "string"
+    },
+    "artifact_name": {
+      "description": "Name for the package artifacts",
+      "required": false,
+      "default": "nuget-packages",
+      "type": "string"
+    },
+    "artifact_paths": {
+      "description": "Paths to include in artifacts",
+      "required": false,
+      "default": "**/bin/Release/*.nupkg",
+      "type": "string"
+    },
+    "artifact_retention_days": {
+      "description": "Days to retain artifacts",
+      "required": false,
+      "default": 7,
+      "type": "number"
+    }
+  }
 }

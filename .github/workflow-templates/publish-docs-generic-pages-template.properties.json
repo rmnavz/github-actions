@@ -1,6 +1,14 @@
 {
   "name": "Publish Docs (Generic Pages)",
   "description": "Publishes static documentation (e.g., DocFX) to GitHub Pages using the reusable workflow.",
+  "categories": [
+    "Documentation",
+    "Deployment"
+  ],
+  "filePatterns": [
+    "docfx.json$",
+    "docs/.*\\.md$"
+  ],
   "parameters": {
     "docfx_project_path": {
       "description": "Path to the DocFX project directory (relative to repo root)",
@@ -14,7 +22,7 @@
       "type": "string"
     },
     "docfx_version": {
-      "description": "DocFX tool version (default: 2.78.3). Allows pinning for security and reproducibility.",
+      "description": "DocFX tool version. Allows pinning for security and reproducibility",
       "required": false,
       "default": "2.78.3",
       "type": "string"
