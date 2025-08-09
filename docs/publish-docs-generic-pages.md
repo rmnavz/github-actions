@@ -2,7 +2,6 @@
 
 This workflow publishes static documentation (e.g., DocFX) to GitHub Pages using a reusable workflow.
 
-
 ## Features
 
 - Reusable via `workflow_call` in external repositories
