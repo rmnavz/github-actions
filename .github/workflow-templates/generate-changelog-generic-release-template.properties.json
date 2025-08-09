@@ -1,0 +1,11 @@
+{
+  "name": "Generate Changelog (Generic Release)",
+  "description": "Reusable workflow for generating and optionally committing a changelog using conventional-changelog-cli.",
+  "iconName": "book",
+  "categories": ["release", "changelog", "automation"],
+  "filePatterns": [
+    "CHANGELOG.md"
+  ],
+  "documentation": "docs/generate-changelog-generic-release.md",
+  "workflowFile": "generate-changelog-generic-release-template.yml"
+}

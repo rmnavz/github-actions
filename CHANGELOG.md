@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Initial repository setup with reusable GitHub Actions workflows
+- Generate Changelog (Generic Release) reusable workflow ([docs](docs/generate-changelog-generic-release.md))
 - Build workflows for .NET solutions and packages
 - Test workflows for .NET unit tests with coverage
 - Publishing workflows for NuGet packages and GitHub releases

@@ -41,6 +41,7 @@ A comprehensive collection of reusable GitHub Actions workflows designed to stre
 | **Build Package** | NuGet package creation | PR, Push | [📖 Docs](docs/build-package-dotnet-ci.md) |
 | **Publish Package** | NuGet package publishing | Release | [📖 Docs](docs/publish-package-dotnet-release.md) |
 | **Git Tagging** | Automated release tagging | Release | [📖 Docs](docs/tag-git-generic-release.md) |
+| **Generate Changelog** | Automated changelog generation & commit | Release, Manual | [📖 Docs](docs/generate-changelog-generic-release.md) |
 
 ## 🔧 Workflow Dependencies
 
@@ -78,6 +79,8 @@ graph TD
   - `GITHUB_TOKEN` (automatically provided)
 
 ## 📚 Documentation
+
+- [Generate Changelog (Generic Release)](docs/generate-changelog-generic-release.md)
 
 Detailed documentation is available for each workflow:
 

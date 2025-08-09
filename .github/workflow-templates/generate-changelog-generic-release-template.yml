@@ -1,0 +1,59 @@
+name: Generate Changelog (Generic Release) (Template)
+
+on:
+  workflow_call:
+    inputs:
+      node_version:
+        description: 'Node.js version for changelog tooling'
+        required: false
+        default: '20'
+        type: string
+      changelog_preset:
+        description: 'Conventional changelog preset'
+        required: false
+        default: 'angular'
+        type: string
+      changelog_file:
+        description: 'Path to changelog file'
+        required: false
+        default: 'CHANGELOG.md'
+        type: string
+      commit_changelog:
+        description: 'Automatically commit and push changelog updates'
+        required: false
+        default: true
+        type: boolean
+      tag_name:
+        description: 'Git tag name for release-specific changelog (optional)'
+        required: false
+        default: ''
+        type: string
+      release_count:
+        description: 'Number of releases to include in changelog (0 = all)'
+        required: false
+        default: 0
+        type: number
+      skip_ci:
+        description: 'Add [skip ci] to commit message'
+        required: false
+        default: true
+        type: boolean
+    outputs:
+      changelog_updated:
+        description: 'Whether changelog was updated'
+        value: ${{ jobs.generate-changelog.outputs.changelog_updated }}
+      changelog_path:
+        description: 'Path to the updated changelog file'
+        value: ${{ jobs.generate-changelog.outputs.changelog_path }}
+
+jobs:
+  generate-changelog:
+    uses: ./.github/workflows/generate-changelog-generic-release.yml
+    with:
+      node_version: ${{ inputs.node_version }}
+      changelog_preset: ${{ inputs.changelog_preset }}
+      changelog_file: ${{ inputs.changelog_file }}
+      commit_changelog: ${{ inputs.commit_changelog }}
+      tag_name: ${{ inputs.tag_name }}
+      release_count: ${{ inputs.release_count }}
+      skip_ci: ${{ inputs.skip_ci }}
