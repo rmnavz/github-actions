@@ -78,7 +78,7 @@ jobs:
             exit 1
           fi
           # Fail if path contains '..' or suspicious characters
-          if [[ "${{ inputs.docfx_project_path }}" == *".."* ]] || [[ "${{ inputs.docfx_project_path }}" =~ [\;\|\$\`] ]]; then
+          if [[ "${{ inputs.docfx_project_path }}" == *".."* ]] || [[ "${{ inputs.docfx_project_path }}" =~ [\;\|\$\`\&\(\)\ \	] ]]; then
             echo "Error: docfx_project_path contains invalid characters."
             exit 1
           fi
