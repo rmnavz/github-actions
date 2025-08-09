@@ -14,7 +14,7 @@ This workflow publishes static documentation (e.g., DocFX) to GitHub Pages using
 
 | Name               | Type   | Required | Default | Description                                             |
 |--------------------|--------|----------|---------|---------------------------------------------------------|
-| docfx_project_path | string | Yes      | —       | Path to the DocFX project directory (relative to root)  |
+| docfx_project_path | string | Yes      | —       | Path to the DocFX project directory (relative to root) |
 | dotnet_version     | string | No       | 8.x     | .NET SDK version to use                                 |
 | docfx_version      | string | No       | 2.78.3  | DocFX tool version to use. Allows pinning for security and reproducibility. |
 
