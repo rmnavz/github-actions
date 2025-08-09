@@ -59,8 +59,16 @@ jobs:
         with:
           dotnet-version: ${{ inputs.dotnet_version }}
 
+
+      - name: Validate docfx_project_path
+        run: |
+          if [[ "${{ inputs.docfx_project_path }}" == /* ]] || [[ "${{ inputs.docfx_project_path }}" == *..* ]]; then
+            echo "Invalid docfx_project_path: must be a relative path within the repository."
+            exit 1
+          fi
+
       - name: Install DocFX
-        run: dotnet tool update -g docfx
+        run: dotnet tool update -g docfx --version 2.78.3
 
       - name: Validate docfx_project_path input
         run: |
