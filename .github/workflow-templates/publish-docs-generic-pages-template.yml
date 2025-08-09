@@ -1,0 +1,37 @@
+# ============================================================================
+# Template: Publish Docs (Generic Pages)
+# Publishes static documentation (e.g., DocFX) to GitHub Pages.
+# ----------------------------------------------------------------------------
+# Usage:
+#   jobs:
+#     publish-docs:
+#       uses: your-org/github-actions/.github/workflows/publish-docs-generic-pages.yml@v1.0.0
+#       with:
+#         docfx_project_path: 'docs'
+#         dotnet_version: '8.x'
+# ============================================================================
+
+name: Publish Docs (Generic Pages) Template
+
+description: >
+  Publishes static documentation (e.g., DocFX) to GitHub Pages using the reusable workflow.
+  Accepts a DocFX project path and optional .NET version.
+
+parameters:
+  docfx_project_path:
+    description: Path to the DocFX project directory (relative to repo root)
+    required: true
+    type: string
+  dotnet_version:
+    description: .NET SDK version
+    required: false
+    default: '8.x'
+    type: string
+
+# Example job usage
+# jobs:
+#   publish-docs:
+#     uses: your-org/github-actions/.github/workflows/publish-docs-generic-pages.yml@v1.0.0
+#     with:
+#       docfx_project_path: 'docs'
+#       dotnet_version: '8.x'

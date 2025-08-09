@@ -1,0 +1,75 @@
+# ============================================================================
+# Publish Docs (Generic Pages)
+# Publishes static documentation (e.g., DocFX) to GitHub Pages.
+# Designed for universal use and workflow reusability.
+# ----------------------------------------------------------------------------
+# Inputs:
+#   docfx_project_path (string, required): Path to the DocFX project directory (relative to repo root)
+#   dotnet_version (string, optional): .NET SDK version (default: 8.x)
+# Outputs:
+#   page_url: URL of the deployed GitHub Pages site
+# Usage Example:
+#   jobs:
+#     publish-docs:
+#       uses: your-org/github-actions/.github/workflows/publish-docs-generic-pages.yml@v1.0.0
+#       with:
+#         docfx_project_path: 'docs'
+# ============================================================================
+
+name: Publish Docs (Generic Pages)
+
+on:
+  workflow_call:
+    inputs:
+      docfx_project_path:
+        description: 'Path to the DocFX project directory (relative to repo root)'
+        required: true
+        type: string
+      dotnet_version:
+        description: '.NET SDK version'
+        required: false
+        default: '8.x'
+        type: string
+    outputs:
+      page_url:
+        description: 'URL of the deployed GitHub Pages site'
+        value: ${{ jobs.publish-docs.outputs.page_url }}
+
+permissions:
+  actions: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  publish-docs:
+    name: Publish Documentation to GitHub Pages
+    runs-on: ubuntu-latest
+    outputs:
+      page_url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ inputs.dotnet_version }}
+
+      - name: Install DocFX
+        run: dotnet tool update -g docfx
+
+      - name: Build Documentation
+        run: docfx ${{ inputs.docfx_project_path }}/docfx.json
+
+      - name: Upload Pages Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '${{ inputs.docfx_project_path }}/_site'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
