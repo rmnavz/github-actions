@@ -29,9 +29,9 @@ on:
         default: ''
         type: string
       release_count:
-        description: 'Number of releases to include in changelog (0 = all)'
+        description: 'Number of releases to include in changelog (-1 = all)'
         required: false
-        default: 0
+        default: -1
         type: number
       skip_ci:
         description: 'Add [skip ci] to commit message'

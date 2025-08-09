@@ -30,7 +30,7 @@ It can be used as a reusable workflow via `workflow_call` in other repositories.
 | `changelog_file`   | string  | `CHANGELOG.md`  | Path to changelog file                                                      |
 | `commit_changelog` | boolean | `true`          | Automatically commit and push changelog updates                             |
 | `tag_name`         | string  | `""`            | Git tag name for release-specific changelog (optional)                      |
-| `release_count`    | number  | `0`             | Number of releases to include in changelog (`0` = all)                      |
+| `release_count`    | number  | `-1`            | Number of releases to include in changelog (`-1` = all)                     |
 | `skip_ci`          | boolean | `true`          | Add `[skip ci]` to commit message                                           |
 
 ---
@@ -60,7 +60,7 @@ jobs:
       changelog_file: 'CHANGELOG.md'
       commit_changelog: true
       tag_name: ''
-      release_count: 0
+      release_count: -1
       skip_ci: true
 ```
 

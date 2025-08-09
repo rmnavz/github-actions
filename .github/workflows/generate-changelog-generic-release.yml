@@ -58,13 +58,6 @@ on:
         required: false
         default: true
         type: boolean
-    outputs:
-      changelog_updated:
-        description: 'Whether changelog was updated'
-        value: ${{ jobs.generate-changelog.outputs.changelog_updated }}
-      changelog_path:
-        description: 'Path to the updated changelog file'
-        value: ${{ jobs.generate-changelog.outputs.changelog_path }}
 
 
 permissions:
