@@ -49,9 +49,9 @@ on:
         default: ''
         type: string
       release_count:
-        description: 'Number of releases to include in changelog (0 = all)'
+        description: 'Number of releases to include in changelog (-1 = all)'
         required: false
-        default: 0
+        default: -1
         type: number
       skip_ci:
         description: 'Add [skip ci] to commit message'
@@ -123,6 +123,7 @@ jobs:
           # Add tag name if specified
           if [[ -n "${{ inputs.tag_name }}" ]]; then
             changelog_args+=(--tag-prefix "" --preset "${{ inputs.changelog_preset }}" --tag "${{ inputs.tag_name }}")
+            changelog_cmd="$changelog_cmd --tag-prefix '' --tag ${{ inputs.tag_name }}"
           fi
 
           echo "Running: conventional-changelog ${changelog_args[@]}"
