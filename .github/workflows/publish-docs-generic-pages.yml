@@ -15,7 +15,9 @@
 #       uses: your-org/github-actions/.github/workflows/publish-docs-generic-pages.yml@v1.0.0
 #       with:
 #         docfx_project_path: 'docs'
-#   docfx_version: Version of DocFX to install (default: 2.78.3). Allows pinning for security and reproducibility.
+#         dotnet_version: '8.x'
+#         docfx_version: '2.78.3'
+# Documentation: See docs/publish-docs-generic-pages.md for more details.
 # ============================================================================
 
 name: Publish Docs (Generic Pages)
@@ -75,7 +77,7 @@ jobs:
             exit 1
           fi
           # Fail if path contains '..' or suspicious characters
-          if [[ "${{ inputs.docfx_project_path }}" == *".."* ]] || [[ "${{ inputs.docfx_project_path }}" =~ [\;\|\$\`\&\(\)\ \	] ]]; then
+          if [[ "${{ inputs.docfx_project_path }}" == *".."* ]] || [[ "${{ inputs.docfx_project_path }}" =~ [';|$`&() 	'] ]]; then
             echo "Error: docfx_project_path contains invalid characters."
             exit 1
           fi

@@ -32,8 +32,8 @@ jobs:
     uses: your-org/github-actions/.github/workflows/publish-docs-generic-pages.yml@v1.0.0
     with:
       docfx_project_path: 'docs'
-  dotnet_version: '8.x'
-  docfx_version: '2.78.3'
+      dotnet_version: '8.x'
+      docfx_version: '2.78.3'
 ```
 
 ## Notes
