@@ -111,21 +111,22 @@ jobs:
         run: |
           echo "Generating changelog with preset: ${{ inputs.changelog_preset }}"
 
-          # Build the conventional-changelog command
-          changelog_cmd="conventional-changelog -p ${{ inputs.changelog_preset }} -i ${{ inputs.changelog_file }} -s"
+
+          # Build up arguments for conventional-changelog
+          changelog_args=(-p "${{ inputs.changelog_preset }}" -i "${{ inputs.changelog_file }}" -s)
 
           # Add release count if specified
           if [[ "${{ inputs.release_count }}" != "0" ]]; then
-            changelog_cmd="$changelog_cmd -r ${{ inputs.release_count }}"
+            changelog_args+=(-r "${{ inputs.release_count }}")
           fi
 
           # Add tag name if specified
           if [[ -n "${{ inputs.tag_name }}" ]]; then
-            changelog_cmd="$changelog_cmd --tag-prefix '' --preset ${{ inputs.changelog_preset }} --tag ${{ inputs.tag_name }}"
+            changelog_args+=(--tag-prefix "" --preset "${{ inputs.changelog_preset }}" --tag "${{ inputs.tag_name }}")
           fi
 
-          echo "Running: $changelog_cmd"
-          eval $changelog_cmd
+          echo "Running: conventional-changelog ${changelog_args[@]}"
+          conventional-changelog "${changelog_args[@]}"
 
           # Check if changelog was actually updated
           if [[ -f "${{ inputs.changelog_file }}.backup" ]]; then
