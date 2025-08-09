@@ -62,6 +62,23 @@ jobs:
       - name: Install DocFX
         run: dotnet tool update -g docfx
 
+      - name: Validate docfx_project_path input
+        run: |
+          # Fail if path is absolute
+          if [[ "${{ inputs.docfx_project_path }}" = /* ]]; then
+            echo "Error: docfx_project_path must be a relative path."
+            exit 1
+          fi
+          # Fail if path contains '..' or suspicious characters
+          if [[ "${{ inputs.docfx_project_path }}" == *".."* ]] || [[ "${{ inputs.docfx_project_path }}" =~ [\;\|\$\`] ]]; then
+            echo "Error: docfx_project_path contains invalid characters."
+            exit 1
+          fi
+          # Fail if directory does not exist or docfx.json is missing
+          if [ ! -f "${{ inputs.docfx_project_path }}/docfx.json" ]; then
+            echo "Error: docfx.json not found in docfx_project_path."
+            exit 1
+          fi
       - name: Build Documentation
         run: docfx ${{ inputs.docfx_project_path }}/docfx.json
 
