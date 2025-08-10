@@ -55,5 +55,3 @@ jobs:
 - [GitHub Actions Reusable Workflows](https://docs.github.com/en/actions/using-workflows/reusing-workflows)
 
 ---
-
-## Last updated: 2025-08-08

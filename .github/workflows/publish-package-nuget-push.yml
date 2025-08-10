@@ -1,0 +1,92 @@
+# ============================================================================
+# Publish Package (NuGet Push Only)
+# Publishes NuGet packages to a configurable NuGet-compatible source (default: nuget.org). No GitHub release is created. Designed for universal use and workflow reusability.
+# ----------------------------------------------------------------------------
+# Inputs:
+#   artifact_name (string, required): Name of the NuGet artifact to download (e.g., nuget-packages)
+#   package_pattern (string, optional): Glob pattern for .nupkg files to publish (default: **/*.nupkg)
+#   nuget_source (string, optional): NuGet/package source URL (default: https://api.nuget.org/v3/index.json)
+# Secrets:
+#   NUGET_API_KEY: API key for publishing to the NuGet/package source
+# Usage Example:
+#   jobs:
+#     publish-nuget-push:
+#       uses: rmnavz/github-actions/.github/workflows/publish-package-nuget-push.yml@v1.0.0
+#       with:
+#         artifact_name: 'nuget-packages'
+# Documentation: See docs/publish-package-nuget-push.md
+# ============================================================================
+
+name: Publish Package (NuGet Push Only)
+
+on:
+  workflow_call:
+    inputs:
+      artifact_name:
+        description: 'Name of the NuGet artifact to download (e.g., nuget-packages)'
+        required: true
+        type: string
+      package_pattern:
+        description: 'Glob pattern for .nupkg files to publish'
+        required: false
+        default: '**/*.nupkg'
+        type: string
+      nuget_source:
+        description: 'NuGet/package source URL'
+        required: false
+        default: 'https://api.nuget.org/v3/index.json'
+        type: string
+    secrets:
+      NUGET_API_KEY:
+        description: 'API key for publishing to the NuGet/package source'
+        required: true
+  workflow_dispatch:
+    inputs:
+      artifact_name:
+        description: 'Name of the NuGet artifact to download (e.g., nuget-packages)'
+        required: true
+        type: string
+      package_pattern:
+        description: 'Glob pattern for .nupkg files to publish'
+        required: false
+        default: '**/*.nupkg'
+        type: string
+      nuget_source:
+        description: 'NuGet/package source URL'
+        required: false
+        default: 'https://api.nuget.org/v3/index.json'
+        type: string
+
+jobs:
+  publish-nuget-push:
+    name: Publish NuGet Package (Push Only)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x' # Set your required .NET version
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Download NuGet Packages
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.artifact_name }}
+      - name: Fail if no packages found
+        run: |
+          shopt -s globstar nullglob
+          files=(${{ inputs.package_pattern }})
+          if [ ${#files[@]} -eq 0 ]; then
+            echo "::error::No .nupkg files found to publish with pattern '${{ inputs.package_pattern }}'."
+            exit 1
+          fi
+      - name: Publish to NuGet
+        run: |
+          shopt -s globstar nullglob
+          for pkg in ${{ inputs.package_pattern }}; do
+            [ -f "$pkg" ] && dotnet nuget push "$pkg" --api-key ${{ secrets.NUGET_API_KEY }} --source "${{ inputs.nuget_source }}" --skip-duplicate
+          done
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
