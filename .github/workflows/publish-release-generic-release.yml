@@ -146,20 +146,24 @@ jobs:
           if [ "${{ inputs.include_test_results }}" == "true" ] && [ -d "TestResults" ] && [ $(find TestResults -name "*.trx" | wc -l) -gt 0 ]; then
             echo "## 🧪 Test Results" >> release_notes.md
             echo "" >> release_notes.md
-            total_tests=$(find TestResults -name "*.trx" -exec grep -o 'total="[0-9]*"' {} \; | grep -o '[0-9]*' | awk '{s+=$1} END {print s+0}')
-            passed_tests=$(find TestResults -name "*.trx" -exec grep -o 'passed="[0-9]*"' {} \; | grep -o '[0-9]*' | awk '{s+=$1} END {print s+0}')
-            failed_tests=$(find TestResults -name "*.trx" -exec grep -o 'failed="[0-9]*"' {} \; | grep -o '[0-9]*' | awk '{s+=$1} END {print s+0}')
-            if [ -n "$total_tests" ] && [ -n "$passed_tests" ]; then
-              echo "- ✅ **$passed_tests** tests passed" >> release_notes.md
-              if [ -n "$failed_tests" ] && [ "$failed_tests" != "0" ]; then
-                echo "- ❌ **$failed_tests** tests failed" >> release_notes.md
+            trx_files=$(find TestResults -name "*.trx")
+            if [ -n "$trx_files" ]; then
+              total_tests=$(grep -ho 'total="[0-9]*"' $trx_files | grep -o '[0-9]*' | awk '{s+=$1} END {if(NR>0) print s; else print ""}')
+              passed_tests=$(grep -ho 'passed="[0-9]*"' $trx_files | grep -o '[0-9]*' | awk '{s+=$1} END {if(NR>0) print s; else print ""}')
+              failed_tests=$(grep -ho 'failed="[0-9]*"' $trx_files | grep -o '[0-9]*' | awk '{s+=$1} END {if(NR>0) print s; else print ""}')
+              if [ -n "$total_tests" ] && [ -n "$passed_tests" ]; then
+                echo "- ✅ **$passed_tests** tests passed" >> release_notes.md
+                if [ -n "$failed_tests" ] && [ "$failed_tests" != "0" ]; then
+                  echo "- ❌ **$failed_tests** tests failed" >> release_notes.md
+                fi
+                echo "- 📊 **$total_tests** total tests executed" >> release_notes.md
+              else
+                echo "- ⚠️ No test results could be parsed from .trx files." >> release_notes.md
               fi
-              echo "- 📊 **$total_tests** total tests executed" >> release_notes.md
             else
-              echo "- ✅ All tests passed successfully" >> release_notes.md
+              echo "- ⚠️ No .trx test result files found." >> release_notes.md
             fi
             echo "" >> release_notes.md
-          fi
           echo "## 📦 Artifacts" >> release_notes.md
           echo "" >> release_notes.md
           for name in $(echo ${{ inputs.artifact_names }} | tr ',' '\n'); do
