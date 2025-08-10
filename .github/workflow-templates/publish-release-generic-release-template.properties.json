@@ -1,0 +1,53 @@
+{
+  "name": "Publish Release (Generic Release)",
+  "description": "Creates a GitHub release with any versioning scheme, attaches specified artifacts, and generates release notes.",
+  "inputs": {
+    "release_version": {
+      "description": "Release version (e.g., v1.0, 2025.08.10, release-42)",
+      "required": true,
+      "type": "string"
+    },
+    "artifact_names": {
+      "description": "Comma-separated list of artifact names to attach to the release",
+      "required": true,
+      "type": "string"
+    },
+    "include_test_results": {
+      "description": "Include test results in release notes",
+      "required": false,
+      "default": false,
+      "type": "boolean"
+    },
+    "changelog_path": {
+      "description": "Path to changelog file",
+      "required": false,
+      "default": "CHANGELOG.md",
+      "type": "string"
+    },
+    "commit_count": {
+      "description": "Number of recent commits to include",
+      "required": false,
+      "default": 10,
+      "type": "number"
+    },
+    "artifact_patterns": {
+      "description": "Comma-separated glob patterns for release assets (e.g., *.nupkg,docs/*.zip)",
+      "required": false,
+      "default": "*.nupkg",
+      "type": "string"
+    }
+  },
+  "outputs": {
+    "release_url": {
+      "description": "URL of the created GitHub release"
+    }
+  },
+  "secrets": {
+    "GITHUB_TOKEN": {
+      "description": "GitHub token for creating releases",
+      "required": true
+    }
+  },
+  "documentation": "docs/publish-release-generic-release.md",
+  "notes": "Workflow enforces best practices by validating that release assets are found before publishing."
+}
