@@ -38,7 +38,7 @@ on:
         type: string
     secrets:
       NUGET_API_KEY:
-        description: 'API key for publishing to NuGet.org'
+        description: 'API key for publishing to the NuGet/package source'
         required: true
   workflow_dispatch:
     inputs:
