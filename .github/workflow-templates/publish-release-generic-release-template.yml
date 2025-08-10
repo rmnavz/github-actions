@@ -31,6 +31,11 @@ on:
         required: false
         default: 10
         type: number
+      artifact_patterns:
+        description: 'Comma-separated glob patterns for release assets (e.g., *.nupkg,docs/*.zip)'
+        required: false
+        default: '*.nupkg'
+        type: string
     secrets:
       GITHUB_TOKEN:
         description: 'GitHub token for creating releases'
@@ -45,5 +50,6 @@ jobs:
       include_test_results: ${{ inputs.include_test_results }}
       changelog_path: ${{ inputs.changelog_path }}
       commit_count: ${{ inputs.commit_count }}
+      artifact_patterns: ${{ inputs.artifact_patterns }}
     secrets:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

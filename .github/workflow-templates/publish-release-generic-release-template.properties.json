@@ -29,6 +29,12 @@
       "required": false,
       "default": 10,
       "type": "number"
+    },
+    "artifact_patterns": {
+      "description": "Comma-separated glob patterns for release assets (e.g., *.nupkg,docs/*.zip)",
+      "required": false,
+      "default": "*.nupkg",
+      "type": "string"
     }
   },
   "outputs": {

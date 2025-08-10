@@ -121,7 +121,7 @@ jobs:
           echo "" >> release_notes.md
           for pkg in *.nupkg; do
             if [ -f "$pkg" ]; then
-              echo "- \\`$pkg\\`" >> release_notes.md
+              echo "- \`$pkg\`" >> release_notes.md
             fi
           done
           echo "" >> release_notes.md

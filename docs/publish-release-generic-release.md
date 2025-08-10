@@ -18,10 +18,11 @@ Creates a GitHub release with any versioning scheme, attaches specified artifact
 | Name                | Type      | Required | Default        | Description                                             |
 |---------------------|-----------|----------|----------------|---------------------------------------------------------|
 | release_version     | string    | yes      |                | Release version (e.g., v1.0, 2025.08.10, release-42)    |
-| artifact_names      | string    | yes      |                | Comma-separated list of artifact names to attach         |
+| artifact_names      | string    | yes      |                | Comma-separated list of artifact names to download (for use in previous jobs) |
 | include_test_results| boolean   | no       | false          | Include test results in release notes                    |
 | changelog_path      | string    | no       | CHANGELOG.md   | Path to changelog file                                  |
 | commit_count        | number    | no       | 10             | Number of recent commits to include                      |
+| artifact_patterns   | string    | no       | *.nupkg        | Comma-separated glob patterns for release assets (e.g., *.nupkg,docs/*.zip)   |
 
 ## 🔒 Secrets
 
@@ -47,18 +48,21 @@ jobs:
       include_test_results: false
       changelog_path: 'CHANGELOG.md'
       commit_count: 10
+      artifact_patterns: '*.nupkg,docs/*.zip' # Attach only NuGet packages and zipped docs
 ```
 
 ## 🏆 Best Practices
 
 - Use descriptive artifact names and ensure they are uploaded in previous jobs.
+- Use `artifact_patterns` to control exactly which files are attached to the release. This helps avoid accidentally uploading sensitive or unnecessary files.
+- Prefer minimal, explicit patterns (e.g., `*.nupkg,docs/*.zip`) over broad patterns (e.g., `**/*`).
 - Keep changelog up to date for meaningful release notes.
 - Use a specific tag (e.g., `@v1.0.0`) when referencing this workflow.
 - Document all workflow parameters in your repository for clarity.
 
 ## 🔗 Related Workflows
 
-- [Publish Package (.NET Release)](publish-package-dotnet-release.md)
+- [Publish Package (.NET Release)](publish-package-nuget-release.md)
 - [Tag Git (Generic Release)](tag-git-generic-release.md)
 
 ---
