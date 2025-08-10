@@ -165,7 +165,6 @@ jobs:
             fi
             echo "" >> release_notes.md
           fi
-          echo "" >> release_notes.md
           echo "## 📦 Artifacts" >> release_notes.md
           echo "" >> release_notes.md
           for name in $(echo ${{ inputs.artifact_names }} | tr ',' '\n'); do
