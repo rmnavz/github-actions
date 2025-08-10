@@ -145,7 +145,11 @@ jobs:
           echo "# Release ${{ inputs.release_version }}" > release_notes.md
           echo "" >> release_notes.md
           if [ "${{ inputs.include_test_results }}" == "true" ]; then
-            trx_files=$(find artifacts -type f -iname "*.trx")
+            if [ -d artifacts ]; then
+              trx_files=$(find artifacts -type f -iname "*.trx")
+            else
+              trx_files=""
+            fi
             if [ -n "$trx_files" ]; then
               echo "## 🧪 Test Results" >> release_notes.md
               echo "" >> release_notes.md
