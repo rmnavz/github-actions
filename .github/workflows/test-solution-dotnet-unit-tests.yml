@@ -144,7 +144,7 @@ jobs:
         if: always()
         with:
           name: ${{ inputs.test_results_artifact_name }}
-          path: TestResults/
+          path: ${{ inputs.test_results_paths }}
           retention-days: ${{ inputs.test_results_retention_days }}
 
       - name: Publish Test Results
