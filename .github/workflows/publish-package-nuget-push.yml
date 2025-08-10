@@ -1,6 +1,6 @@
 # ============================================================================
 # Publish Package (NuGet Push Only)
-# Publishes NuGet packages to nuget.org. No GitHub release is created. Designed for universal use and workflow reusability.
+# Publishes NuGet packages to a configurable NuGet-compatible source (default: nuget.org). No GitHub release is created. Designed for universal use and workflow reusability.
 # ----------------------------------------------------------------------------
 # Inputs:
 #   artifact_name (string, required): Name of the NuGet artifact to download (e.g., nuget-packages)
