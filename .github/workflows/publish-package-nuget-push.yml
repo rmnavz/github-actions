@@ -14,7 +14,7 @@
 #       uses: rmnavz/github-actions/.github/workflows/publish-package-nuget-push.yml@v1.0.0
 #       with:
 #         artifact_name: 'nuget-packages'
-# Documentation: See docs/publish-package-nuget-release.md
+# Documentation: See docs/publish-package-nuget-push.md
 # ============================================================================
 
 name: Publish Package (NuGet Push Only)
