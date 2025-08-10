@@ -59,7 +59,8 @@ jobs:
     name: Publish Documentation to GitHub Pages
     runs-on: ubuntu-latest
     outputs:
-      page_url: ${{ steps.set_page_url.outputs.page_url }}
+  # Use the custom set_page_url step because actions/deploy-pages does not output the final Pages URL.
+  page_url: ${{ steps.set_page_url.outputs.page_url }}
     steps:
       - name: Checkout Source
         uses: actions/checkout@v4
@@ -98,6 +99,8 @@ jobs:
       - name: Ensure index.html exists
         run: |
           SITE_PATH="${{ inputs.docfx_project_path }}/_site"
+          # Some static site generators (like DocFX) output README.html instead of index.html for the root.
+          # GitHub Pages requires index.html at the site root. Copy if needed.
           if [ -f "$SITE_PATH/README.html" ] && [ ! -f "$SITE_PATH/index.html" ]; then
             cp "$SITE_PATH/README.html" "$SITE_PATH/index.html"
           fi
@@ -116,6 +119,10 @@ jobs:
         run: |
           REPO_OWNER="${{ github.repository_owner }}"
           REPO_NAME="${{ github.event.repository.name }}"
+          # GitHub Pages convention: user/organization sites are named 'owner.github.io'
+          # and are hosted at 'https://owner.github.io/'. Project sites are hosted at
+          # 'https://owner.github.io/repo'. See:
+          # https://docs.github.com/en/pages/getting-started-with-github-pages/about-github-pages#types-of-github-pages-sites
           if [ "$REPO_NAME" = "$REPO_OWNER.github.io" ]; then
             PAGE_URL="https://$REPO_OWNER.github.io/"
           else
