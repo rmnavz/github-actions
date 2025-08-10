@@ -1,0 +1,159 @@
+# ============================================================================
+# Publish Release (Generic Release)
+# Creates a GitHub release with any versioning scheme, attaches specified artifacts, and generates release notes.
+# ----------------------------------------------------------------------------
+# Inputs:
+#   release_version (string, required): Release version (e.g., v1.0, 2025.08.10, release-42)
+#   artifact_names (string, required): Comma-separated list of artifact names to attach
+#   include_test_results (boolean, optional): Include test results in release notes (default: false)
+#   changelog_path (string, optional): Path to changelog file (default: CHANGELOG.md)
+#   commit_count (number, optional): Number of recent commits to include (default: 10)
+# Secrets:
+#   GITHUB_TOKEN: GitHub token for creating releases
+# Outputs:
+#   release_url: URL of the created GitHub release
+# Usage Example:
+#   jobs:
+#     publish-release:
+#       uses: rmnavz/github-actions/.github/workflows/publish-release-generic-release.yml@v1.0.0
+#       with:
+#         release_version: 'v1.0.0'
+#         artifact_names: 'nuget-packages,docs-artifact'
+#         include_test_results: false
+#         changelog_path: 'CHANGELOG.md'
+#         commit_count: 10
+# Documentation: See docs/publish-release-generic-release.md
+# ============================================================================
+
+name: Publish Release (Generic Release)
+
+on:
+  workflow_call:
+    inputs:
+      release_version:
+        description: 'Release version (e.g., v1.0, 2025.08.10, release-42)'
+        required: true
+        type: string
+      artifact_names:
+        description: 'Comma-separated list of artifact names to attach to the release'
+        required: true
+        type: string
+      include_test_results:
+        description: 'Include test results in release notes'
+        required: false
+        default: false
+        type: boolean
+      changelog_path:
+        description: 'Path to changelog file'
+        required: false
+        default: 'CHANGELOG.md'
+        type: string
+      commit_count:
+        description: 'Number of recent commits to include'
+        required: false
+        default: 10
+        type: number
+    outputs:
+      release_url:
+        description: 'URL of the created GitHub release'
+        value: ${{ jobs.publish-release.outputs.release_url }}
+  workflow_dispatch:
+    inputs:
+      release_version:
+        description: 'Release version (e.g., v1.0, 2025.08.10, release-42)'
+        required: true
+        type: string
+      artifact_names:
+        description: 'Comma-separated list of artifact names to attach to the release'
+        required: true
+        type: string
+      include_test_results:
+        description: 'Include test results in release notes'
+        required: false
+        default: false
+        type: boolean
+      changelog_path:
+        description: 'Path to changelog file'
+        required: false
+        default: 'CHANGELOG.md'
+        type: string
+      commit_count:
+        description: 'Number of recent commits to include'
+        required: false
+        default: 10
+        type: number
+
+jobs:
+  publish-release:
+    name: Create Generic Release
+    runs-on: ubuntu-latest
+    outputs:
+      release_url: ${{ steps.create_release.outputs.url }}
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Download Artifacts
+        run: |
+          IFS=',' read -ra NAMES <<< "${{ inputs.artifact_names }}"
+          for name in "${NAMES[@]}"; do
+            gh run download --name "$name" || echo "Artifact $name not found"
+          done
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Download Test Results (Optional)
+        uses: actions/download-artifact@v4
+        with:
+          name: test-results
+        continue-on-error: true
+        if: ${{ inputs.include_test_results }}
+      - name: Generate Release Notes
+        id: release_notes
+        run: |
+          echo "# Release ${{ inputs.release_version }}" > release_notes.md
+          echo "" >> release_notes.md
+          if [ "${{ inputs.include_test_results }}" == "true" ] && [ -d "TestResults" ] && [ $(find TestResults -name "*.trx" | wc -l) -gt 0 ]; then
+            echo "## 🧪 Test Results" >> release_notes.md
+            echo "" >> release_notes.md
+            total_tests=$(find TestResults -name "*.trx" -exec grep -o 'total="[0-9]*"' {} \; | grep -o '[0-9]*' | awk '{s+=$1} END {print s}')
+            passed_tests=$(find TestResults -name "*.trx" -exec grep -o 'passed="[0-9]*"' {} \; | grep -o '[0-9]*' | awk '{s+=$1} END {print s}')
+            failed_tests=$(find TestResults -name "*.trx" -exec grep -o 'failed="[0-9]*"' {} \; | grep -o '[0-9]*' | awk '{s+=$1} END {print s}')
+            if [ -n "$total_tests" ] && [ -n "$passed_tests" ]; then
+              echo "- ✅ **$passed_tests** tests passed" >> release_notes.md
+              if [ -n "$failed_tests" ] && [ "$failed_tests" != "0" ]; then
+                echo "- ❌ **$failed_tests** tests failed" >> release_notes.md
+              fi
+              echo "- 📊 **$total_tests** total tests executed" >> release_notes.md
+            else
+              echo "- ✅ All tests passed successfully" >> release_notes.md
+            fi
+            echo "" >> release_notes.md
+          fi
+          echo "## 📦 Artifacts" >> release_notes.md
+          echo "" >> release_notes.md
+          for name in $(echo ${{ inputs.artifact_names }} | tr ',' '\n'); do
+            echo "- $name" >> release_notes.md
+          done
+          echo "" >> release_notes.md
+          echo "## 📝 Changelog" >> release_notes.md
+          if [ -f "${{ inputs.changelog_path }}" ]; then
+            cat "${{ inputs.changelog_path }}" >> release_notes.md
+          else
+            echo "No changelog available." >> release_notes.md
+          fi
+          echo "" >> release_notes.md
+          echo "## 🔄 Recent Commits" >> release_notes.md
+          git log --pretty=format:'- %s (%an, %h)' --no-merges -n ${{ inputs.commit_count }} >> release_notes.md
+      - name: Create GitHub Release
+        id: create_release
+        uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ inputs.release_version }}
+          name: Release ${{ inputs.release_version }}
+          draft: false
+          prerelease: false
+          body_path: release_notes.md
+          files: "**/*"

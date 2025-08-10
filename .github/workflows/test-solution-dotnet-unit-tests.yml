@@ -123,14 +123,6 @@ jobs:
 
       # Optionally skip build if using build artifact
       - name: Build Solution/Project
-
-# Notes & Best Practices:
-# - Use clear, descriptive names for jobs, steps, and inputs.
-# - Document all inputs, outputs, and secrets at the top.
-# - Use 'workflow_call' for reusability and composability.
-# - Use 'id:' for steps whose outputs are needed later.
-# - Pin action versions for reproducibility.
-# - Add caching or matrix strategies if needed for your stack.
         if: ${{ inputs.use_build_artifact != true }}
         run: dotnet build ${{ inputs.project_path }} --no-restore --configuration Release
 
@@ -152,7 +144,7 @@ jobs:
         if: always()
         with:
           name: ${{ inputs.test_results_artifact_name }}
-          path: ${{ inputs.test_results_paths }}
+          path: TestResults/
           retention-days: ${{ inputs.test_results_retention_days }}
 
       - name: Publish Test Results

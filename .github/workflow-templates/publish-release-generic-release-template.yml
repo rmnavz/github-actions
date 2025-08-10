@@ -1,0 +1,49 @@
+# ============================================================================
+# Publish Release (Generic Release) - Template
+# Thin wrapper for the implementation workflow, for discoverability and reuse.
+# ============================================================================
+
+name: Publish Release (Generic Release) (Template)
+
+on:
+  workflow_call:
+    inputs:
+      release_version:
+        description: 'Release version (e.g., v1.0, 2025.08.10, release-42)'
+        required: true
+        type: string
+      artifact_names:
+        description: 'Comma-separated list of artifact names to attach to the release'
+        required: true
+        type: string
+      include_test_results:
+        description: 'Include test results in release notes'
+        required: false
+        default: false
+        type: boolean
+      changelog_path:
+        description: 'Path to changelog file'
+        required: false
+        default: 'CHANGELOG.md'
+        type: string
+      commit_count:
+        description: 'Number of recent commits to include'
+        required: false
+        default: 10
+        type: number
+    secrets:
+      GITHUB_TOKEN:
+        description: 'GitHub token for creating releases'
+        required: true
+
+jobs:
+  main:
+    uses: ./.github/workflows/publish-release-generic-release.yml
+    with:
+      release_version: ${{ inputs.release_version }}
+      artifact_names: ${{ inputs.artifact_names }}
+      include_test_results: ${{ inputs.include_test_results }}
+      changelog_path: ${{ inputs.changelog_path }}
+      commit_count: ${{ inputs.commit_count }}
+    secrets:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
