@@ -59,8 +59,8 @@ jobs:
     name: Publish Documentation to GitHub Pages
     runs-on: ubuntu-latest
     outputs:
-  # Use the custom set_page_url step because actions/deploy-pages does not output the final Pages URL.
-  page_url: ${{ steps.set_page_url.outputs.page_url }}
+      # Use the custom set_page_url step because actions/deploy-pages does not output the final Pages URL.
+      page_url: ${{ steps.set_page_url.outputs.page_url }}
     steps:
       - name: Checkout Source
         uses: actions/checkout@v4
@@ -119,13 +119,21 @@ jobs:
         run: |
           REPO_OWNER="${{ github.repository_owner }}"
           REPO_NAME="${{ github.event.repository.name }}"
-          # GitHub Pages convention: user/organization sites are named 'owner.github.io'
-          # and are hosted at 'https://owner.github.io/'. Project sites are hosted at
-          # 'https://owner.github.io/repo'. See:
-          # https://docs.github.com/en/pages/getting-started-with-github-pages/about-github-pages#types-of-github-pages-sites
-          if [ "$REPO_NAME" = "$REPO_OWNER.github.io" ]; then
-            PAGE_URL="https://$REPO_OWNER.github.io/"
+          SITE_PATH="${{ inputs.docfx_project_path }}/_site"
+          # If a CNAME file exists, use its value as the custom domain for the page_url.
+          if [ -f "$SITE_PATH/CNAME" ]; then
+            # Read the first line, trim whitespace, and use as the custom domain.
+            CUSTOM_DOMAIN=$(head -n 1 "$SITE_PATH/CNAME" | tr -d '\r\n[:space:]')
+            PAGE_URL="https://$CUSTOM_DOMAIN/"
           else
-            PAGE_URL="https://$REPO_OWNER.github.io/$REPO_NAME/"
+            # GitHub Pages convention: user/organization sites are named 'owner.github.io'
+            # and are hosted at 'https://owner.github.io/'. Project sites are hosted at
+            # 'https://owner.github.io/repo'. See:
+            # https://docs.github.com/en/pages/getting-started-with-github-pages/about-github-pages#types-of-github-pages-sites
+            if [ "$REPO_NAME" = "$REPO_OWNER.github.io" ]; then
+              PAGE_URL="https://$REPO_OWNER.github.io/"
+            else
+              PAGE_URL="https://$REPO_OWNER.github.io/$REPO_NAME/"
+            fi
           fi
           echo "page_url=$PAGE_URL" >> $GITHUB_OUTPUT
