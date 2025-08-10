@@ -48,5 +48,6 @@
       "required": true
     }
   },
-  "documentation": "docs/publish-release-generic-release.md"
+  "documentation": "docs/publish-release-generic-release.md",
+  "notes": "Workflow enforces best practices by validating that release assets are found before publishing."
 }

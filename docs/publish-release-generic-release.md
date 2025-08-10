@@ -60,6 +60,8 @@ jobs:
 - Use a specific tag (e.g., `@v1.0.0`) when referencing this workflow.
 - Document all workflow parameters in your repository for clarity.
 
+**Note:** This workflow enforces best practices by validating that release assets are found before publishing. If no files are found matching your `artifact_patterns`, the workflow will fail with a clear error message. This prevents accidental empty or misconfigured releases.
+
 ## 🔗 Related Workflows
 
 - [Publish Package (.NET Release)](publish-package-nuget-release.md)
