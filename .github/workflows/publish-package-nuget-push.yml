@@ -7,7 +7,7 @@
 #   package_pattern (string, optional): Glob pattern for .nupkg files to publish (default: **/*.nupkg)
 #   nuget_source (string, optional): NuGet/package source URL (default: https://api.nuget.org/v3/index.json)
 # Secrets:
-#   NUGET_API_KEY: API key for publishing to NuGet.org
+#   NUGET_API_KEY: API key for publishing to the NuGet/package source
 # Usage Example:
 #   jobs:
 #     publish-nuget-push:
