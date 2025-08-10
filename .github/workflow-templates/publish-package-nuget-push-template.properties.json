@@ -27,8 +27,7 @@
     }
   },
   "usage": "jobs:\n  publish-nuget-push:\n    uses: rmnavz/github-actions/.github/workflows/publish-package-nuget-push.yml@v1.0.0\n    with:\n      artifact_name: 'nuget-packages'\n      package_pattern: '**/*.nupkg'\n      nuget_source: 'https://api.nuget.org/v3/index.json'\n",
-  "documentation": "See docs/publish-package-nuget-push.md"
-  ,
+  "documentation": "See docs/publish-package-nuget-push.md",
   "categories": [
     "Deployment",
     "Package Management"

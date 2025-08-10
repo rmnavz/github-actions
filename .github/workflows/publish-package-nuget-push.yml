@@ -77,7 +77,7 @@ jobs:
       - name: Fail if no packages found
         run: |
           shopt -s globstar nullglob
-          files=(${ { inputs.package_pattern } })
+          files=(${{ inputs.package_pattern }})
           if [ ${#files[@]} -eq 0 ]; then
             echo "::error::No .nupkg files found to publish with pattern '${{ inputs.package_pattern }}'."
             exit 1
