@@ -143,11 +143,11 @@ jobs:
         run: |
           echo "# Release ${{ inputs.release_version }}" > release_notes.md
           echo "" >> release_notes.md
-          if [ "${{ inputs.include_test_results }}" == "true" ] && [ -d "TestResults" ] && [ $(find TestResults -name "*.trx" | wc -l) -gt 0 ]; then
-            echo "## 🧪 Test Results" >> release_notes.md
-            echo "" >> release_notes.md
-            trx_files=$(find TestResults -name "*.trx")
+          if [ "${{ inputs.include_test_results }}" == "true" ]; then
+            trx_files=$(find . -type f -name "*.trx")
             if [ -n "$trx_files" ]; then
+              echo "## 🧪 Test Results" >> release_notes.md
+              echo "" >> release_notes.md
               total_tests=$(grep -ho 'total="[0-9]*"' $trx_files | grep -o '[0-9]*' | awk '{s+=$1} END {if(NR>0) print s; else print ""}')
               passed_tests=$(grep -ho 'passed="[0-9]*"' $trx_files | grep -o '[0-9]*' | awk '{s+=$1} END {if(NR>0) print s; else print ""}')
               failed_tests=$(grep -ho 'failed="[0-9]*"' $trx_files | grep -o '[0-9]*' | awk '{s+=$1} END {if(NR>0) print s; else print ""}')
@@ -163,6 +163,7 @@ jobs:
             else
               echo "- ⚠️ No .trx test result files found." >> release_notes.md
             fi
+            echo "" >> release_notes.md
           fi
           echo "" >> release_notes.md
           echo "## 📦 Artifacts" >> release_notes.md
