@@ -117,7 +117,7 @@ jobs:
       - name: Pack NuGet Package
         run: dotnet pack ${{ inputs.project_path }} --configuration Release -p:PackageVersion=${{ inputs.release_version }} --output ./artifacts
       - name: Upload NuGet Packages Artifact
-        if: ${{ inputs.upload_artifacts == 'true' }}
+        if: ${{ inputs.upload_artifacts }}
         uses: actions/upload-artifact@v4
         with:
           name: ${{ inputs.artifact_name }}
