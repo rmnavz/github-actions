@@ -1,13 +1,13 @@
 # ============================================================================
 # Publish Package (NuGet Push Only)
-# Publishes NuGet packages to nuget.org. No GitHub release is created. Designed for universal use and workflow reusability.
+# Publishes NuGet packages to a configurable NuGet-compatible source (default: nuget.org). No GitHub release is created. Designed for universal use and workflow reusability.
 # ----------------------------------------------------------------------------
 # Inputs:
 #   artifact_name (string, required): Name of the NuGet artifact to download (e.g., nuget-packages)
 #   package_pattern (string, optional): Glob pattern for .nupkg files to publish (default: **/*.nupkg)
 #   nuget_source (string, optional): NuGet/package source URL (default: https://api.nuget.org/v3/index.json)
 # Secrets:
-#   NUGET_API_KEY: API key for publishing to NuGet.org
+#   NUGET_API_KEY: API key for publishing to the NuGet/package source
 # Usage Example:
 #   jobs:
 #     publish-nuget-push:
@@ -38,7 +38,7 @@ on:
         type: string
     secrets:
       NUGET_API_KEY:
-        description: 'API key for publishing to NuGet.org'
+        description: 'API key for publishing to the NuGet/package source'
         required: true
   workflow_dispatch:
     inputs:
