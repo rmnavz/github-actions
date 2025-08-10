@@ -108,7 +108,7 @@ jobs:
         run: |
           IFS=',' read -ra NAMES <<< "${{ inputs.artifact_names }}"
           for name in "${NAMES[@]}"; do
-            gh run download --name "$name" || echo "Artifact '$name' not found. Please check if the artifact was uploaded in a previous job and that the name is correct."
+            gh run download --name "$name" || { echo "::error::Artifact '$name' not found. Please check if the artifact was uploaded in a previous job and that the name is correct."; exit 1; }
           done
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
