@@ -59,7 +59,8 @@ jobs:
     name: Publish Documentation to GitHub Pages
     runs-on: ubuntu-latest
     outputs:
-      page_url: ${{ steps.deployment.outputs.page_url }}
+      # Use the custom set_page_url step because actions/deploy-pages does not output the final Pages URL.
+      page_url: ${{ steps.set_page_url.outputs.page_url }}
     steps:
       - name: Checkout Source
         uses: actions/checkout@v4
@@ -95,11 +96,48 @@ jobs:
       - name: Build Documentation
         run: docfx ${{ inputs.docfx_project_path }}/docfx.json
 
+      - name: Ensure index.html exists
+        run: |
+          SITE_PATH="${{ inputs.docfx_project_path }}/_site"
+          # Some static site generators (like DocFX) output README.html instead of index.html for the root.
+          # GitHub Pages requires index.html at the site root. Copy if needed.
+          if [ -f "$SITE_PATH/README.html" ] && [ ! -f "$SITE_PATH/index.html" ]; then
+            cp "$SITE_PATH/README.html" "$SITE_PATH/index.html"
+            if [ $? -ne 0 ]; then
+              echo "Error: Failed to copy README.html to index.html. Aborting deployment." >&2
+              exit 1
+            fi
+          fi
+
       - name: Upload Pages Artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: '${{ inputs.docfx_project_path }}/_site'
+          path: "${{ inputs.docfx_project_path }}/_site"
 
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+      - name: Set page_url output
+        id: set_page_url
+        run: |
+          REPO_OWNER="${{ github.repository_owner }}"
+          REPO_NAME="${{ github.event.repository.name }}"
+          SITE_PATH="${{ inputs.docfx_project_path }}/_site"
+          # If a CNAME file exists, use its value as the custom domain for the page_url.
+          if [ -f "$SITE_PATH/CNAME" ]; then
+            # Read the first line, trim whitespace, and use as the custom domain.
+            CUSTOM_DOMAIN=$(head -n 1 "$SITE_PATH/CNAME" | tr -d '\r\n' | xargs)
+            PAGE_URL="https://$CUSTOM_DOMAIN/"
+          else
+            # GitHub Pages convention: user/organization sites are named 'owner.github.io'
+            # and are hosted at 'https://owner.github.io/'. Project sites are hosted at
+            # 'https://owner.github.io/repo'. See:
+            # https://docs.github.com/en/pages/getting-started-with-github-pages/about-github-pages#types-of-github-pages-sites
+            if [ "$REPO_NAME" = "$REPO_OWNER.github.io" ]; then
+              PAGE_URL="https://$REPO_OWNER.github.io/"
+            else
+              PAGE_URL="https://$REPO_OWNER.github.io/$REPO_NAME/"
+            fi
+          fi
+          echo "page_url=$PAGE_URL" >> $GITHUB_OUTPUT
