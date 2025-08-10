@@ -127,7 +127,7 @@ jobs:
           # If a CNAME file exists, use its value as the custom domain for the page_url.
           if [ -f "$SITE_PATH/CNAME" ]; then
             # Read the first line, trim whitespace, and use as the custom domain.
-            CUSTOM_DOMAIN=$(head -n 1 "$SITE_PATH/CNAME" | tr -d '\r\n[:space:]')
+            CUSTOM_DOMAIN=$(head -n 1 "$SITE_PATH/CNAME" | tr -d '\r\n' | xargs)
             PAGE_URL="https://$CUSTOM_DOMAIN/"
           else
             # GitHub Pages convention: user/organization sites are named 'owner.github.io'
