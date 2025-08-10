@@ -120,7 +120,13 @@ jobs:
           files=""
           IFS=',' read -ra globs <<< "$patterns"
           for pattern in "${globs[@]}"; do
-            for f in artifacts/**/$pattern; do
+            # If the pattern already starts with 'artifacts/', use as is; otherwise, prefix it
+            if [[ "$pattern" == artifacts/* ]]; then
+              search_pattern="$pattern"
+            else
+              search_pattern="artifacts/**/$pattern"
+            fi
+            for f in $search_pattern; do
               [ -e "$f" ] && files="$files $f"
             done
           done
