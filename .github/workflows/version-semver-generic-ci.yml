@@ -77,9 +77,9 @@ jobs:
         id: gitversion
         run: |
           if [ "${{ inputs.gitversion_config }}" != "" ]; then
-            gitversion /output json -c "${{ inputs.gitversion_config }}" | tee version.json
+            dotnet-gitversion /output json -c "${{ inputs.gitversion_config }}" | tee version.json
           else
-            gitversion /output json | tee version.json
+            dotnet-gitversion /output json | tee version.json
           fi
           echo "semver=$(cat version.json | jq -r ".SemVer")" >> $GITHUB_OUTPUT
           echo "major=$(cat version.json | jq -r ".Major")" >> $GITHUB_OUTPUT
