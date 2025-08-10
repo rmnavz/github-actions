@@ -103,6 +103,10 @@ jobs:
           # GitHub Pages requires index.html at the site root. Copy if needed.
           if [ -f "$SITE_PATH/README.html" ] && [ ! -f "$SITE_PATH/index.html" ]; then
             cp "$SITE_PATH/README.html" "$SITE_PATH/index.html"
+            if [ $? -ne 0 ]; then
+              echo "Error: Failed to copy README.html to index.html. Aborting deployment." >&2
+              exit 1
+            fi
           fi
 
       - name: Upload Pages Artifact
