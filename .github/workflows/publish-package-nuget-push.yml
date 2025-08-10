@@ -86,7 +86,7 @@ jobs:
         run: |
           shopt -s globstar nullglob
           for pkg in ${{ inputs.package_pattern }}; do
-            [ -f "$pkg" ] && dotnet nuget push "$pkg" --source "${{ inputs.nuget_source }}" --skip-duplicate
+            [ -f "$pkg" ] && dotnet nuget push "$pkg" --api-key ${{ secrets.NUGET_API_KEY }} --source "${{ inputs.nuget_source }}" --skip-duplicate
           done
         env:
           NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
