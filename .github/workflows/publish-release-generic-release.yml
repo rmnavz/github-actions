@@ -106,9 +106,10 @@ jobs:
           fetch-depth: 0
       - name: Download Artifacts
         run: |
+          mkdir -p artifacts
           IFS=',' read -ra NAMES <<< "${{ inputs.artifact_names }}"
           for name in "${NAMES[@]}"; do
-            gh run download --name "$name" || { echo "::error::Artifact '$name' not found. Please check if the artifact was uploaded in a previous job and that the name is correct."; exit 1; }
+            gh run download --name "$name" --dir artifacts || { echo "::error::Artifact '$name' not found. Please check if the artifact was uploaded in a previous job and that the name is correct."; exit 1; }
           done
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -119,7 +120,7 @@ jobs:
           files=""
           IFS=',' read -ra globs <<< "$patterns"
           for pattern in "${globs[@]}"; do
-            for f in $pattern; do
+            for f in artifacts/**/$pattern; do
               [ -e "$f" ] && files="$files $f"
             done
           done
@@ -143,11 +144,15 @@ jobs:
         run: |
           echo "# Release ${{ inputs.release_version }}" > release_notes.md
           echo "" >> release_notes.md
-          if [ "${{ inputs.include_test_results }}" == "true" ] && [ -d "TestResults" ] && [ $(find TestResults -name "*.trx" | wc -l) -gt 0 ]; then
-            echo "## 🧪 Test Results" >> release_notes.md
-            echo "" >> release_notes.md
-            trx_files=$(find TestResults -name "*.trx")
+          if [ "${{ inputs.include_test_results }}" == "true" ]; then
+            if [ -d artifacts ]; then
+              trx_files=$(find artifacts -type f -iname "*.trx")
+            else
+              trx_files=""
+            fi
             if [ -n "$trx_files" ]; then
+              echo "## 🧪 Test Results" >> release_notes.md
+              echo "" >> release_notes.md
               total_tests=$(grep -ho 'total="[0-9]*"' $trx_files | grep -o '[0-9]*' | awk '{s+=$1} END {if(NR>0) print s; else print ""}')
               passed_tests=$(grep -ho 'passed="[0-9]*"' $trx_files | grep -o '[0-9]*' | awk '{s+=$1} END {if(NR>0) print s; else print ""}')
               failed_tests=$(grep -ho 'failed="[0-9]*"' $trx_files | grep -o '[0-9]*' | awk '{s+=$1} END {if(NR>0) print s; else print ""}')
@@ -164,6 +169,7 @@ jobs:
               echo "- ⚠️ No .trx test result files found." >> release_notes.md
             fi
           fi
+
           echo "" >> release_notes.md
           echo "## 📦 Artifacts" >> release_notes.md
           echo "" >> release_notes.md
@@ -189,6 +195,8 @@ jobs:
           tag_name: ${{ inputs.release_version }}
           name: Release ${{ inputs.release_version }}
           draft: false
-          prerelease: false
+          # NOTE: This prerelease detection is basic and only checks for a hyphen in the version string.
+          #       It may need improvement if your versioning scheme uses hyphens for stable releases.
+          prerelease: ${{ contains(inputs.release_version, '-') }}
           body_path: release_notes.md
           files: ${{ steps.find_assets.outputs.files }}
