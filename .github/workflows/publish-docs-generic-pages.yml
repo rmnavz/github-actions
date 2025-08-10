@@ -97,14 +97,15 @@ jobs:
 
       - name: Ensure index.html exists
         run: |
-          if [ -f "${{ inputs.docfx_project_path }}/_site/README.html" ] && [ ! -f "${{ inputs.docfx_project_path }}/_site/index.html" ]; then
-            cp "${{ inputs.docfx_project_path }}/_site/README.html" "${{ inputs.docfx_project_path }}/_site/index.html"
+          SITE_PATH="${{ inputs.docfx_project_path }}/_site"
+          if [ -f "$SITE_PATH/README.html" ] && [ ! -f "$SITE_PATH/index.html" ]; then
+            cp "$SITE_PATH/README.html" "$SITE_PATH/index.html"
           fi
 
       - name: Upload Pages Artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: '${{ inputs.docfx_project_path }}/_site'
+          path: "${{ inputs.docfx_project_path }}/_site"
 
       - name: Deploy to GitHub Pages
         id: deployment
