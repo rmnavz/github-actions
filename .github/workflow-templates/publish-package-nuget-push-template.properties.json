@@ -1,0 +1,40 @@
+{
+  "name": "Publish Package (NuGet Push Only)",
+  "description": "Publishes NuGet packages to a specified NuGet or package source. No GitHub release is created. Designed for universal use and workflow reusability.",
+  "inputs": {
+    "artifact_name": {
+      "type": "string",
+      "required": true,
+      "description": "Name of the NuGet artifact to download (e.g., nuget-packages)"
+    },
+    "package_pattern": {
+      "type": "string",
+      "required": false,
+      "default": "**/*.nupkg",
+      "description": "Glob pattern for .nupkg files to publish"
+    },
+    "nuget_source": {
+      "type": "string",
+      "required": false,
+      "default": "https://api.nuget.org/v3/index.json",
+      "description": "NuGet/package source URL"
+    }
+  },
+  "secrets": {
+    "NUGET_API_KEY": {
+      "required": true,
+      "description": "API key for publishing to the NuGet/package source"
+    }
+  },
+  "usage": "jobs:\n  publish-nuget-push:\n    uses: rmnavz/github-actions/.github/workflows/publish-package-nuget-push.yml@v1.0.0\n    with:\n      artifact_name: 'nuget-packages'\n      package_pattern: '**/*.nupkg'\n      nuget_source: 'https://api.nuget.org/v3/index.json'\n",
+  "documentation": "See docs/publish-package-nuget-push.md"
+  ,
+  "categories": [
+    "Deployment",
+    "Package Management"
+  ],
+  "filePatterns": [
+    ".*\\.nupkg$",
+    "nuget.config$"
+  ]
+}

@@ -1,0 +1,38 @@
+# ============================================================================
+# Publish Package (NuGet Push Only) - Workflow Template
+# Template for calling the reusable NuGet push workflow
+# ============================================================================
+
+name: Publish Package (NuGet Push Only) (Template)
+
+on:
+  workflow_call:
+    inputs:
+      artifact_name:
+        description: 'Name of the NuGet artifact to download (e.g., nuget-packages)'
+        required: true
+        type: string
+      package_pattern:
+        description: 'Glob pattern for .nupkg files to publish'
+        required: false
+        default: '**/*.nupkg'
+        type: string
+      nuget_source:
+        description: 'NuGet/package source URL'
+        required: false
+        default: 'https://api.nuget.org/v3/index.json'
+        type: string
+    secrets:
+      NUGET_API_KEY:
+        description: 'API key for publishing to the NuGet/package source'
+        required: true
+
+jobs:
+  main:
+    uses: ./.github/workflows/publish-package-nuget-push.yml
+    with:
+      artifact_name: ${{ inputs.artifact_name }}
+      package_pattern: ${{ inputs.package_pattern }}
+      nuget_source: ${{ inputs.nuget_source }}
+    secrets:
+      NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
