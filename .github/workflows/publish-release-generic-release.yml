@@ -175,7 +175,7 @@ jobs:
           echo "" >> release_notes.md
           echo "## 📦 Artifacts" >> release_notes.md
           echo "" >> release_notes.md
-          for name in $(echo ${{ inputs.artifact_names }} | tr ',' '\\n'); do
+          for name in $(echo ${{ inputs.artifact_names }} | tr ',' '\n'); do
             echo "- $name" >> release_notes.md
           done
           echo "" >> release_notes.md
