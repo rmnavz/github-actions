@@ -104,6 +104,16 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      - name: Detect Prerelease
+        id: detect_prerelease
+        run: |
+          version="${{ inputs.release_version }}"
+          # Match -alpha, -beta, -rc, -pre, -preview (case-insensitive)
+          if [[ "$version" =~ -([Aa][Ll][Pp][Hh][Aa]|[Bb][Ee][Tt][Aa]|[Rr][Cc]|[Pp][Rr][Ee]|[Pp][Rr][Ee][Vv][Ii][Ee][Ww]) ]]; then
+            echo "is_prerelease=true" >> $GITHUB_OUTPUT
+          else
+            echo "is_prerelease=false" >> $GITHUB_OUTPUT
+          fi
       - name: Download Artifacts
         run: |
           mkdir -p artifacts
@@ -150,9 +160,9 @@ jobs:
             if [ -n "$trx_files" ]; then
               echo "## 🧪 Test Results" >> release_notes.md
               echo "" >> release_notes.md
-              total_tests=$(grep -ho 'total="[0-9]*"' $trx_files | grep -o '[0-9]*' | awk '{s+=$1} END {if(NR>0) print s; else print ""}')
-              passed_tests=$(grep -ho 'passed="[0-9]*"' $trx_files | grep -o '[0-9]*' | awk '{s+=$1} END {if(NR>0) print s; else print ""}')
-              failed_tests=$(grep -ho 'failed="[0-9]*"' $trx_files | grep -o '[0-9]*' | awk '{s+=$1} END {if(NR>0) print s; else print ""}')
+              total_tests=$(grep -ho 'total=\"[0-9]*\"' $trx_files | grep -o '[0-9]*' | awk '{s+=$1} END {if(NR>0) print s; else print \"\"}')
+              passed_tests=$(grep -ho 'passed=\"[0-9]*\"' $trx_files | grep -o '[0-9]*' | awk '{s+=$1} END {if(NR>0) print s; else print \"\"}')
+              failed_tests=$(grep -ho 'failed=\"[0-9]*\"' $trx_files | grep -o '[0-9]*' | awk '{s+=$1} END {if(NR>0) print s; else print \"\"}')
               if [ -n "$total_tests" ] && [ -n "$passed_tests" ]; then
                 echo "- ✅ **$passed_tests** tests passed" >> release_notes.md
                 if [ -n "$failed_tests" ] && [ "$failed_tests" != "0" ]; then
@@ -170,7 +180,7 @@ jobs:
           echo "" >> release_notes.md
           echo "## 📦 Artifacts" >> release_notes.md
           echo "" >> release_notes.md
-          for name in $(echo ${{ inputs.artifact_names }} | tr ',' '\n'); do
+          for name in $(echo ${{ inputs.artifact_names }} | tr ',' '\\n'); do
             echo "- $name" >> release_notes.md
           done
           echo "" >> release_notes.md
@@ -206,8 +216,7 @@ jobs:
           tag_name: ${{ inputs.release_version }}
           name: Release ${{ inputs.release_version }}
           draft: false
-          # NOTE: This prerelease detection is basic and only checks for a hyphen in the version string.
-          #       It may need improvement if your versioning scheme uses hyphens for stable releases.
-          prerelease: ${{ contains(inputs.release_version, '-') }}
+          # Improved prerelease detection: only true if version contains -alpha, -beta, -rc, -pre, or -preview (case-insensitive)
+          prerelease: ${{ steps.detect_prerelease.outputs.is_prerelease }}
           body_path: release_notes.md
           files: ${{ steps.find_assets.outputs.files }}
