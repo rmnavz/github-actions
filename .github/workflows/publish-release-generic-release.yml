@@ -130,8 +130,8 @@ jobs:
           files=""
           IFS=',' read -ra globs <<< "$patterns"
           for pattern in "${globs[@]}"; do
-            # Recursively search in artifacts directory
-            for f in $(find artifacts -type f -name "$pattern" 2>/dev/null); do
+            # Recursively search in artifacts directory, case-insensitive
+            for f in $(find artifacts -type f -iname "$pattern" 2>/dev/null); do
               [ -e "$f" ] && files="$files $f"
             done
           done
@@ -150,19 +150,14 @@ jobs:
           echo "# Release ${{ inputs.release_version }}" > release_notes.md
           echo "_Published on $(date -u '+%Y-%m-%d %H:%M UTC')_" >> release_notes.md
           echo "" >> release_notes.md
-
-          if [ "${{ inputs.include_test_results }}" == "true" ]; then
-            if [ -d artifacts ]; then
-              trx_files=$(find artifacts -type f -name "*.trx" 2>/dev/null)
-            else
-              trx_files=""
-            fi
+          if [ "${{ inputs.include_test_results }}" == "true" ] && [ -d "TestResults" ] && [ $(find TestResults -name "*.trx" | wc -l) -gt 0 ]; then
+            echo "## 🧪 Test Results" >> release_notes.md
+            echo "" >> release_notes.md
+            trx_files=$(find TestResults -name "*.trx")
             if [ -n "$trx_files" ]; then
-              echo "## 🧪 Test Results" >> release_notes.md
-              echo "" >> release_notes.md
-              total_tests=$(printf '%s\n' $trx_files | xargs -r grep -ho 'total="[0-9]*"' | grep -o '[0-9]*' | awk '{s+=$1} END {if(NR>0) print s; else print ""}')
-              passed_tests=$(grep -ho 'passed=\"[0-9]*\"' $trx_files | grep -o '[0-9]*' | awk '{s+=$1} END {if(NR>0) print s; else print \"\"}')
-              failed_tests=$(grep -ho 'failed=\"[0-9]*\"' $trx_files | grep -o '[0-9]*' | awk '{s+=$1} END {if(NR>0) print s; else print \"\"}')
+              total_tests=$(grep -ho 'total="[0-9]*"' $trx_files | grep -o '[0-9]*' | awk '{s+=$1} END {if(NR>0) print s; else print ""}')
+              passed_tests=$(grep -ho 'passed="[0-9]*"' $trx_files | grep -o '[0-9]*' | awk '{s+=$1} END {if(NR>0) print s; else print ""}')
+              failed_tests=$(grep -ho 'failed="[0-9]*"' $trx_files | grep -o '[0-9]*' | awk '{s+=$1} END {if(NR>0) print s; else print ""}')
               if [ -n "$total_tests" ] && [ -n "$passed_tests" ]; then
                 echo "- ✅ **$passed_tests** tests passed" >> release_notes.md
                 if [ -n "$failed_tests" ] && [ "$failed_tests" != "0" ]; then
