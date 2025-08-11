@@ -120,13 +120,8 @@ jobs:
           files=""
           IFS=',' read -ra globs <<< "$patterns"
           for pattern in "${globs[@]}"; do
-            # If the pattern already starts with 'artifacts/', use as is; otherwise, prefix it
-            if [[ "$pattern" == artifacts/* ]]; then
-              search_pattern="$pattern"
-            else
-              search_pattern="artifacts/**/$pattern"
-            fi
-            for f in $search_pattern; do
+            # Recursively search in artifacts directory
+            for f in $(find artifacts -type f -iname "$pattern" 2>/dev/null); do
               [ -e "$f" ] && files="$files $f"
             done
           done
@@ -139,19 +134,14 @@ jobs:
             echo "::error::No files found for release assets. Check your artifact_patterns input and ensure artifacts are downloaded."
             exit 1
           fi
-      - name: Download Test Results (Optional)
-        uses: actions/download-artifact@v4
-        with:
-          name: test-results
-        continue-on-error: true
-        if: ${{ inputs.include_test_results }}
       - name: Generate Release Notes
         id: release_notes
         run: |
           echo "# Release ${{ inputs.release_version }}" > release_notes.md
+          echo "_Published on $(date -u '+%Y-%m-%d %H:%M UTC')_" >> release_notes.md
           echo "" >> release_notes.md
           if [ "${{ inputs.include_test_results }}" == "true" ]; then
-            trx_files=$(find artifacts -type f -iname "*.trx")
+            trx_files=$(find artifacts -type f -iname "*.trx" 2>/dev/null)
             if [ -n "$trx_files" ]; then
               echo "## 🧪 Test Results" >> release_notes.md
               echo "" >> release_notes.md
@@ -180,9 +170,23 @@ jobs:
             echo "- $name" >> release_notes.md
           done
           echo "" >> release_notes.md
+          echo "## 📦 Released Files" >> release_notes.md
+          if [ -n "${{ steps.find_assets.outputs.files }}" ]; then
+            for file in ${{ steps.find_assets.outputs.files }}; do
+              echo "- $(basename \"$file\")" >> release_notes.md
+            done
+          else
+            echo "No files matched artifact_patterns." >> release_notes.md
+          fi
+          echo "" >> release_notes.md
           echo "## 📝 Changelog" >> release_notes.md
-          if [ -f "${{ inputs.changelog_path }}" ]; then
-            cat "${{ inputs.changelog_path }}" >> release_notes.md
+          changelog_file="${{ inputs.changelog_path }}"
+          # Recursively search for changelog in artifacts directory
+          found_changelog=$(find artifacts -type f -iname "$(basename "$changelog_file")" 2>/dev/null | head -n 1)
+          if [ -n "$found_changelog" ]; then
+            cat "$found_changelog" >> release_notes.md
+          elif [ -f "$changelog_file" ]; then
+            cat "$changelog_file" >> release_notes.md
           else
             echo "No changelog available." >> release_notes.md
           fi
