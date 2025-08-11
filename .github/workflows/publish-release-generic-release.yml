@@ -131,7 +131,7 @@ jobs:
           IFS=',' read -ra globs <<< "$patterns"
           for pattern in "${globs[@]}"; do
             # Recursively search in artifacts directory
-            for f in $(find artifacts -type f -iname "$pattern" 2>/dev/null); do
+            for f in $(find artifacts -type f -name "$pattern" 2>/dev/null); do
               [ -e "$f" ] && files="$files $f"
             done
           done
@@ -153,7 +153,7 @@ jobs:
 
           if [ "${{ inputs.include_test_results }}" == "true" ]; then
             if [ -d artifacts ]; then
-              trx_files=$(find artifacts -type f -iname "*.trx" 2>/dev/null)
+              trx_files=$(find artifacts -type f -name "*.trx" 2>/dev/null)
             else
               trx_files=""
             fi
@@ -196,7 +196,7 @@ jobs:
           echo "## 📝 Changelog" >> release_notes.md
           changelog_file="${{ inputs.changelog_path }}"
           # Recursively search for changelog in artifacts directory
-          found_changelog=$(find artifacts -type f -iname "$(basename "$changelog_file")" 2>/dev/null | head -n 1)
+          found_changelog=$(find artifacts -type f -name "$(basename "$changelog_file")" 2>/dev/null | head -n 1)
           if [ -n "$found_changelog" ]; then
             cat "$found_changelog" >> release_notes.md
           elif [ -f "$changelog_file" ]; then
