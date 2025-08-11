@@ -140,8 +140,13 @@ jobs:
           echo "# Release ${{ inputs.release_version }}" > release_notes.md
           echo "_Published on $(date -u '+%Y-%m-%d %H:%M UTC')_" >> release_notes.md
           echo "" >> release_notes.md
+
           if [ "${{ inputs.include_test_results }}" == "true" ]; then
-            trx_files=$(find artifacts -type f -iname "*.trx" 2>/dev/null)
+            if [ -d artifacts ]; then
+              trx_files=$(find artifacts -type f -iname "*.trx" 2>/dev/null)
+            else
+              trx_files=""
+            fi
             if [ -n "$trx_files" ]; then
               echo "## 🧪 Test Results" >> release_notes.md
               echo "" >> release_notes.md
@@ -160,9 +165,8 @@ jobs:
             else
               echo "- ⚠️ No .trx test result files found." >> release_notes.md
             fi
-            fi
-            echo "" >> release_notes.md
           fi
+
           echo "" >> release_notes.md
           echo "## 📦 Artifacts" >> release_notes.md
           echo "" >> release_notes.md
