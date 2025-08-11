@@ -186,7 +186,7 @@ jobs:
           echo "## 📝 Changelog" >> release_notes.md
           changelog_file="${{ inputs.changelog_path }}"
           # Recursively search for changelog in artifacts directory
-          found_changelog=$(find artifacts -type f -iname "$(basename "$changelog_file")" 2>/dev/null | head -n 1)
+          found_changelog=$(find artifacts -type f -name "$(basename "$changelog_file")" 2>/dev/null | head -n 1)
           if [ -n "$found_changelog" ]; then
             cat "$found_changelog" >> release_notes.md
           elif [ -f "$changelog_file" ]; then
