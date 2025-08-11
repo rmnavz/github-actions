@@ -109,7 +109,7 @@ jobs:
         run: |
           version="${{ inputs.release_version }}"
           # Match -alpha, -beta, -rc, -pre, -preview (case-insensitive)
-          if [[ "$version" =~ -([Aa][Ll][Pp][Hh][Aa]|[Bb][Ee][Tt][Aa]|[Rr][Cc]|[Pp][Rr][Ee]|[Pp][Rr][Ee][Vv][Ii][Ee][Ww]) ]]; then
+          if [[ "${version,,}" =~ -(alpha|beta|rc|pre|preview) ]]; then
             echo "is_prerelease=true" >> $GITHUB_OUTPUT
           else
             echo "is_prerelease=false" >> $GITHUB_OUTPUT
