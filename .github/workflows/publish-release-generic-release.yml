@@ -54,7 +54,7 @@ on:
         default: 10
         type: number
       artifact_patterns:
-        description: 'Comma-separated glob patterns for release assets (e.g., *.nupkg,docs/*.zip)'
+        description: 'Glob patterns for release assets, separated by comma, comma+space, or space (e.g., *.nupkg,docs/*.zip or *.nupkg docs/*.zip)'
         required: false
         default: '*.nupkg'
         type: string
@@ -88,7 +88,7 @@ on:
         default: 10
         type: number
       artifact_patterns:
-        description: 'Comma-separated glob patterns for release assets (e.g., *.nupkg,docs/*.zip)'
+        description: 'Glob patterns for release assets, separated by comma, comma+space, or space (e.g., *.nupkg,docs/*.zip or *.nupkg docs/*.zip)'
         required: false
         default: '*.nupkg'
         type: string
@@ -128,7 +128,14 @@ jobs:
         run: |
           patterns="${{ inputs.artifact_patterns }}"
           files=""
-          IFS=',' read -ra globs <<< "$patterns"
+          # Split patterns on comma, comma+space, or space
+          globs=()
+          for pat in $patterns; do
+            IFS=',' read -ra split <<< "$pat"
+            for s in "${split[@]}"; do
+              [[ -n "$s" ]] && globs+=("$s")
+            done
+          done
           for pattern in "${globs[@]}"; do
             # Recursively search in artifacts directory, case-insensitive
             for f in $(find artifacts -type f -iname "$pattern" 2>/dev/null); do

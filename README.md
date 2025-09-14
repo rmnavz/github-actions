@@ -1,8 +1,8 @@
 # GitHub Actions Reusable Workflows
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![GitHub Issues](https://img.shields.io/github/issues/yourusername/github-actions)](https://github.com/yourusername/github-actions/issues)
-[![GitHub Stars](https://img.shields.io/github/stars/yourusername/github-actions)](https://github.com/yourusername/github-actions/stargazers)
+[![GitHub Issues](https://img.shields.io/github/issues/rmnavz/github-actions)](https://github.com/rmnavz/github-actions/issues)
+[![GitHub Stars](https://img.shields.io/github/stars/rmnavz/github-actions)](https://github.com/rmnavz/github-actions/stargazers)
 
 A comprehensive collection of reusable GitHub Actions workflows designed to streamline CI/CD processes for .NET projects. These workflows provide automated building, testing, packaging, and deployment capabilities while following best practices for maintainable and secure automation.
 
